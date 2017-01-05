@@ -3,10 +3,12 @@ package Model;
 import org.omg.PortableServer.AdapterActivator;
 
 public class Bidder extends Player {
-	private double magicNumberByGoods;
-	private double magicNumberByDegree;
+	private double priorityByGoodsAndSquare;
+	private double priorityByDegreeAndSquare;
 	private double paymentByDegree;
 	private double paymentByGoods;
+	private double criticalValue;
+
 	private int[] bundle;
 	private int totalGoods;
 	
@@ -15,24 +17,29 @@ public class Bidder extends Player {
 		this.totalGoods = totalGoods;
 		bundle = new int[totalGoods];
 	}
-
-	public double getMagicNumberByGoods() {
-		return magicNumberByGoods;
+	
+	public double getCriticalValue() {
+		return criticalValue;
+	}
+	public void setCriticalValue(double criticalValue) {
+		this.criticalValue = criticalValue;
 	}
 
-	public void setMagicNumberByGoods(double magicNumberByGoods) {
-		this.magicNumberByGoods = magicNumberByGoods;
+	public double getPriorityByGoodsAndSquare() {
+		return priorityByGoodsAndSquare;
 	}
 
-	public double getMagicNumberByDegree() {
-		return magicNumberByDegree;
+	public void setPriorityByGoodsAndSquare(double PriorityByGoodsAndSquare) {
+		this.priorityByGoodsAndSquare = PriorityByGoodsAndSquare;
 	}
 
-	public void setMagicNumberByDegree(double magicNumberByDegree) {
-		this.magicNumberByDegree = magicNumberByDegree;
+	public double getPriorityByDegreeAndSquare() {
+		return priorityByDegreeAndSquare;
 	}
 
-
+	public void setPriorityByDegreeAndSquare(double PriorityByDegreeAndSquare) {
+		this.priorityByDegreeAndSquare = PriorityByDegreeAndSquare;
+	}
 
 	public double getPaymentByDegree() {
 		return paymentByDegree;
@@ -65,6 +72,4 @@ public class Bidder extends Player {
 	public void setBundle(int position, int choose) {
 		bundle[position] = choose;
 	}
-	
-	
 }

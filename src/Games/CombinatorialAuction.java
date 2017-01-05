@@ -15,48 +15,39 @@ import java.util.Random;
 import Model.Bidder;
 
 public class CombinatorialAuction {
-	private String heuristic;
+	private String winnerDeteminationAlgo;
 	private String type;
 	private int totalGoods;
-	private int size;
-	private int[][] admatrix;
-	int[] degree;
-	int[] goods; // each bidder's goods count
+	private int totalBidders;
+	private int[][] conflictionMatrix;
+	int[] degreeCountsOfEachBidder;
+	public int[] bundleCountsOfEachBidder;
 	List<Bidder> bidders;
 
 	public CombinatorialAuction(int size, int totalGoods) {
-		this.size = size;
+		this.totalBidders = size;
 		this.totalGoods = totalGoods;
-		admatrix = new int[size][size];
+		conflictionMatrix = new int[size][size];
+		bundleCountsOfEachBidder = new int[size];
+		degreeCountsOfEachBidder = new int[size];
 		initBidders();
-		initBundlesAndMatrix();
+		initBundlesAndConflictionMatrix();
 		initBidderWeight(100);
 		randomizeBidderID();
 
-		degree = new int[size];
 		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				if (admatrix[i][j] == 1)
-					degree[i]++;
-			}
-		}
-
-		goods = new int[size];
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < totalGoods; j++) {
-				if (bidders.get(i).getBundle()[j] == 1)
-					goods[i]++;
-			}
-		}
-		for (int i = 0; i < size; i++) {
-			bidders.get(i).setMagicNumberByDegree((double) bidders.get(i).getWeight() / Math.sqrt(degree[i]) + 1);
-			bidders.get(i).setMagicNumberByGoods((double) bidders.get(i).getWeight() / Math.sqrt(goods[i]));
+			bidders.get(i).setPriorityByDegreeAndSquare((double) bidders.get(i).getWeight() / (degreeCountsOfEachBidder[i]+1));
+			bidders.get(i).setPriorityByGoodsAndSquare((double) bidders.get(i).getWeight() / (bundleCountsOfEachBidder[i]));
 		}
 	}
+	
+	public List<Bidder> getBidders() {
+		return bidders;
+	}
 
-	public void start(String heuristic, String type) {
+	public void start(String winnerDeterminationAlgo, String type) {
 		this.type = type;
-		this.heuristic = heuristic;
+		this.winnerDeteminationAlgo = winnerDeterminationAlgo;
 		if (type.equals("game")) {
 			Game_async();
 		} else {
@@ -66,42 +57,83 @@ public class CombinatorialAuction {
 
 	private void initBidders() {
 		bidders = new ArrayList<>();
-		for (int i = 0; i < size; i++) {
-			Bidder bidder = new Bidder(i, size, 1, totalGoods);
+		for (int i = 0; i < totalBidders; i++) {
+			Bidder bidder = new Bidder(i, totalBidders, 1, totalGoods);
 			bidders.add(bidder);
 		}
 	}
 
-	private void initBundlesAndMatrix() {
+	private void initBundlesAndConflictionMatrix() {
 		Random ran = new Random();
-		for (int i = 0; i < size; i++) {
+		
+		// for each bidder, random choose to take or not take a good. 
+		for (int i = 0; i < totalBidders; i++) {
 			Bidder bidder = bidders.get(i);
 			for (int j = 0; j < totalGoods; j++) {
-				if (ran.nextInt(25) % 25 == 0)
-					bidder.getBundle()[j] = 1;
+				if (ran.nextInt(25) % 25 == 0) {
+					bidder.setBundle(j, 1);
+					bundleCountsOfEachBidder[i] ++ ;
+				}
 			}
 		}
 
-		for (int i = 0; i < size; i++) {
-			for (int j = i + 1; j < size; j++) {
+		// make a adjacency matrix represent of the confliction of every bidder
+		for (int i = 0; i < totalBidders; i++) {
+			for (int j = i + 1; j < totalBidders; j++) {
 				for (int k = 0; k < totalGoods; k++) {
 					if (bidders.get(i).getBundle()[k] == 1 && bidders.get(j).getBundle()[k] == 1) {
-						admatrix[i][j] = 1;
-						admatrix[j][i] = 1;
+						conflictionMatrix[i][j] = 1;
+						conflictionMatrix[j][i] = 1;
+						degreeCountsOfEachBidder[i] ++ ;
+						degreeCountsOfEachBidder[j] ++ ;
 						break;
 					}
 				}
 			}
 		}
 	}
+	
+	public void initBidderWeight(int goodWeightRange) {
+		Random ran = new Random();
+		int bidderWeight = 0;
+		int[] weightOfGood = new int[totalGoods];
+		for (int i = 0; i < totalGoods; i++) {
+			weightOfGood[i] = ran.nextInt(goodWeightRange) + 1;
+		}
+		for (int i = 0; i < totalBidders; i++) {
+			for (int j = 0; j < totalGoods; j++) {
+				if (bidders.get(i).getBundle()[j] == 1) {
+					double normalRandomNumber = 0;
+					while (normalRandomNumber <= 0) {
+						normalRandomNumber = ran.nextGaussian() * (weightOfGood[j] / 5) + weightOfGood[j];
+					}
+					bidderWeight += normalRandomNumber;
+				}
+			}
+			bidders.get(i).setWeight(bidderWeight);
+			bidderWeight = 0;
+		}
+	}
 
+	public void randomizeBidderID() {
+		Random ran = new Random();
+		int target;
+		int temp;
+		for (int i = 0; i < totalBidders; i++) {
+			temp = bidders.get(i).getID();
+			target = ran.nextInt(totalBidders);
+			bidders.get(i).setID(bidders.get(target).getID());
+			bidders.get(target).setID(temp);
+		}
+	}
+	
 	private void Centralized_aysnc() {
-		if (heuristic.equals("ours")) {
+		if (winnerDeteminationAlgo.equals("ours")) {
 
 			// mapping bidders and their weight
 			HashMap<Integer, Double> map = new HashMap<>();
-			for (int i = 0; i < size; i++) {
-				map.put(i, bidders.get(i).getMagicNumberByDegree());
+			for (int i = 0; i < totalBidders; i++) {
+				map.put(i, bidders.get(i).getPriorityByDegreeAndSquare());
 			}
 
 			// sorting by weight/square(degree)+1
@@ -132,22 +164,22 @@ public class CombinatorialAuction {
 				}
 				// second price payment
 				double temp = 0;
-				for (int i = 0; i < size; i++) {
-					if (admatrix[entry.getKey()][i] == 1) {
-						if (bidders.get(i).getMagicNumberByDegree() > temp) {
-							temp = bidders.get(i).getMagicNumberByDegree();
+				for (int i = 0; i < totalBidders; i++) {
+					if (conflictionMatrix[entry.getKey()][i] == 1) {
+						if (bidders.get(i).getPriorityByDegreeAndSquare() > temp) {
+							temp = bidders.get(i).getPriorityByDegreeAndSquare();
 						}
 					}
 				}
 				currentBidder.setChoice(1);
-				currentBidder.setPaymentByDegree(temp * Math.sqrt(degree[entry.getKey()]) + 1);
+				currentBidder.setPaymentByDegree(temp * Math.sqrt(degreeCountsOfEachBidder[entry.getKey()]+1));
 			}
 		} else { // LOS02
 			
 			// mapping bidders and their weight
 			HashMap<Integer, Double> map = new HashMap<>();
-			for (int i = 0; i < size; i++) {
-				map.put(i, bidders.get(i).getMagicNumberByGoods());
+			for (int i = 0; i < totalBidders; i++) {
+				map.put(i, bidders.get(i).getPriorityByGoodsAndSquare());
 			}
 
 			// sorting by weight/square(degree)+1
@@ -178,15 +210,15 @@ public class CombinatorialAuction {
 				}
 				// second price payment
 				double temp = 0;
-				for (int i = 0; i < size; i++) {
-					if (admatrix[entry.getKey()][i] == 1) {
-						if (bidders.get(i).getMagicNumberByGoods() > temp) {
-							temp = bidders.get(i).getMagicNumberByGoods();
+				for (int i = 0; i < totalBidders; i++) {
+					if (conflictionMatrix[entry.getKey()][i] == 1) {
+						if (bidders.get(i).getPriorityByGoodsAndSquare() > temp) {
+							temp = bidders.get(i).getPriorityByGoodsAndSquare();
 						}
 					}
 				}
 				currentBidder.setChoice(1);
-				currentBidder.setPaymentByGoods(temp * Math.sqrt(goods[entry.getKey()]));
+				currentBidder.setPaymentByGoods(temp * Math.sqrt(bundleCountsOfEachBidder[entry.getKey()]));
 			}
 		}
 	}
@@ -194,11 +226,11 @@ public class CombinatorialAuction {
 	private void Game_async() {
 		int flag;
 		int newDecision;
-		if (heuristic.equals("ours")) {
+		if (winnerDeteminationAlgo.equals("ours")) {
 			for (int step = 1;; step++) {
 				flag = 0;
-				for (int i = 0; i < size; i++) {
-					newDecision = heuristic(i);
+				for (int i = 0; i < totalBidders; i++) {
+					newDecision = ourWinnerDetermination(i);
 					if (bidders.get(i).getChoice() != newDecision) {
 						bidders.get(i).setChoice(newDecision);
 						flag = 1;
@@ -208,16 +240,16 @@ public class CombinatorialAuction {
 				if (flag == 0)
 					break;
 			}
-			for (int i = 0; i < size; i++) {
+			for (int i = 0; i < totalBidders; i++) {
 				if (bidders.get(i).getChoice() == 1) {
 					double temp = 0;
-					for (int j = 0; j < size; j++) {
-						if (admatrix[i][j] == 1) {
-							if (bidders.get(j).getMagicNumberByDegree() > temp)
-								temp = bidders.get(j).getMagicNumberByDegree();
+					for (int j = 0; j < totalBidders; j++) {
+						if (conflictionMatrix[i][j] == 1) {
+							if (bidders.get(j).getPriorityByDegreeAndSquare() > temp)
+								temp = bidders.get(j).getPriorityByDegreeAndSquare();
 						}
 					}
-					bidders.get(i).setPaymentByDegree(temp * Math.sqrt(degree[i]) + 1);
+					bidders.get(i).setPaymentByDegree(temp * (degreeCountsOfEachBidder[i]+1));
 				} else {
 					bidders.get(i).setPaymentByDegree(0);
 				}
@@ -225,8 +257,8 @@ public class CombinatorialAuction {
 		} else { // LOS02
 			for (int step = 1;; step++) {
 				flag = 0;
-				for (int i = 0; i < size; i++) {
-					newDecision = heuristic2(i);
+				for (int i = 0; i < totalBidders; i++) {
+					newDecision = LOS02WinnerDetermination(i);
 					if (bidders.get(i).getChoice() != newDecision) {
 						bidders.get(i).setChoice(newDecision);
 						flag = 1;
@@ -236,16 +268,16 @@ public class CombinatorialAuction {
 				if (flag == 0)
 					break;
 			}
-			for (int i = 0; i < size; i++) {
+			for (int i = 0; i < totalBidders; i++) {
 				if (bidders.get(i).getChoice() == 1) {
 					double temp = 0;
-					for (int j = 0; j < size; j++) {
-						if (admatrix[i][j] == 1) {
-							if (bidders.get(j).getMagicNumberByGoods() > temp)
-								temp = bidders.get(j).getMagicNumberByGoods();
+					for (int j = 0; j < totalBidders; j++) {
+						if (conflictionMatrix[i][j] == 1) {
+							if (bidders.get(j).getPriorityByGoodsAndSquare() > temp)
+								temp = bidders.get(j).getPriorityByGoodsAndSquare();
 						}
 					}
-					bidders.get(i).setPaymentByGoods(temp * Math.sqrt(goods[i]));
+					bidders.get(i).setPaymentByGoods(temp * (bundleCountsOfEachBidder[i]));
 				} else {
 					bidders.get(i).setPaymentByGoods(0);
 				}
@@ -257,18 +289,18 @@ public class CombinatorialAuction {
 	private void checkResult() {
 		int flag = 0;
 
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < totalBidders; i++) {
 			if (bidders.get(i).getChoice() == 1) {
-				for (int j = 0; j < size; j++) {
-					if (admatrix[i][j] == 1 && bidders.get(j).getChoice() == 1) {
+				for (int j = 0; j < totalBidders; j++) {
+					if (conflictionMatrix[i][j] == 1 && bidders.get(j).getChoice() == 1) {
 						flag = 1;
 						break;
 					}
 				}
 			} else {
 				flag = 2;
-				for (int j = 0; j < size; j++) {
-					if (admatrix[i][j] == 1 && bidders.get(j).getChoice() == 1) {
+				for (int j = 0; j < totalBidders; j++) {
+					if (conflictionMatrix[i][j] == 1 && bidders.get(j).getChoice() == 1) {
 						flag = 0;
 						break;
 					}
@@ -281,22 +313,40 @@ public class CombinatorialAuction {
 			}
 		}
 	}
+	
+	private void calculateCriticalValue() {
+		for(int i=0; i<totalBidders; i++){
+			// winner
+			if (bidders.get(i).getChoice() == 1) {
+				
+			} else {  // loser
+				double temp = 999999999;
+				for(int j=0; j<totalBidders; j++){
+					if (conflictionMatrix[i][j] == 1 && bidders.get(j).getChoice() == 1){
+						if (bidders.get(j).getPriorityByDegreeAndSquare() < temp)
+							temp = bidders.get(j).getPriorityByDegreeAndSquare();
+					}
+				}
+				bidders.get(i).setCriticalValue(temp * Math.sqrt(degreeCountsOfEachBidder[i]+1));
+			}
+		}
+	}
 
-	private int heuristic(int currentBidder) {
+	private int ourWinnerDetermination(int currentBidder) {
 		double m_current, m_compare;
-		int[] degree = new int[size];
+		int[] degree = new int[totalBidders];
 
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				if (admatrix[i][j] == 1)
+		for (int i = 0; i < totalBidders; i++) {
+			for (int j = 0; j < totalBidders; j++) {
+				if (conflictionMatrix[i][j] == 1)
 					degree[i]++;
 			}
 		}
 
 		m_current = (double) bidders.get(currentBidder).getWeight() / (degree[currentBidder] + 1);
 
-		for (int i = 0; i < size; i++) {
-			if (admatrix[currentBidder][i] == 1 && bidders.get(i).getChoice() == 1) {
+		for (int i = 0; i < totalBidders; i++) {
+			if (conflictionMatrix[currentBidder][i] == 1 && bidders.get(i).getChoice() == 1) {
 				m_compare = (double) bidders.get(i).getWeight() / (degree[i] + 1);
 				if (m_compare > m_current)
 					return 0;
@@ -307,11 +357,11 @@ public class CombinatorialAuction {
 		return 1;
 	}
 
-	private int heuristic2(int currentBidder) {
+	private int LOS02WinnerDetermination(int currentBidder) {
 		double m_current, m_compare;
-		int[] goods = new int[size];
+		int[] goods = new int[totalBidders];
 
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < totalBidders; i++) {
 			for (int j = 0; j < totalGoods; j++) {
 				if (bidders.get(i).getBundle()[j] == 1)
 					goods[i]++;
@@ -320,8 +370,8 @@ public class CombinatorialAuction {
 
 		m_current = (double) bidders.get(currentBidder).getWeight() / goods[currentBidder];
 
-		for (int i = 0; i < size; i++) {
-			if (admatrix[currentBidder][i] == 1 && bidders.get(i).getChoice() == 1) {
+		for (int i = 0; i < totalBidders; i++) {
+			if (conflictionMatrix[currentBidder][i] == 1 && bidders.get(i).getChoice() == 1) {
 				m_compare = (double) bidders.get(i).getWeight() / goods[i];
 				if (m_compare > m_current)
 					return 0;
@@ -330,43 +380,5 @@ public class CombinatorialAuction {
 			}
 		}
 		return 1;
-	}
-
-	public List<Bidder> getBidders() {
-		return bidders;
-	}
-
-	public void randomizeBidderID() {
-		Random ran = new Random();
-		int target;
-		int temp;
-		for (int i = 0; i < size; i++) {
-			temp = bidders.get(i).getID();
-			target = ran.nextInt(size);
-			bidders.get(i).setID(bidders.get(target).getID());
-			bidders.get(target).setID(temp);
-		}
-	}
-
-	public void initBidderWeight(int goodWeightRange) {
-		Random ran = new Random();
-		int bidderWeight = 0;
-		int[] weightOfGood = new int[totalGoods];
-		for (int i = 0; i < totalGoods; i++) {
-			weightOfGood[i] = ran.nextInt(goodWeightRange) + 1;
-		}
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < totalGoods; j++) {
-				if (bidders.get(i).getBundle()[j] == 1) {
-					double normalRandomNumber = 0;
-					while (normalRandomNumber <= 0) {
-						normalRandomNumber = ran.nextGaussian() * (weightOfGood[j] / 5) + weightOfGood[j];
-					}
-					bidderWeight += normalRandomNumber;
-				}
-			}
-			bidders.get(i).setWeight(bidderWeight);
-			bidderWeight = 0;
-		}
 	}
 }
