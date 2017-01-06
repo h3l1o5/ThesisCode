@@ -12,9 +12,11 @@ public class Main {
 	private static final String ASYNC = "asynchronize";
 	private static final String GWMIN = "gwmin";
 	private static final String GWMIN2 = "gwmin2";
-	private static final int TOTAL_PLAYER = 30;
-	private static final int TOTAL_GOODS = 300;
+	private static final int TOTAL_PLAYER = 10;
+	private static final int TOTAL_GOODS = 50;
 	private static final int TOTAL_FILES = 1;
+	private static final int CHANCE = 10;
+	private static final int MEAN_WEIGHT_PER_GOOD = 5000;
 
 	public static void main(String[] args) throws IOException {
 
@@ -30,7 +32,7 @@ public class Main {
 			double totalPaymentDegree;
 			double totalPaymentGoods;
 			List<Bidder> bidders;
-			CombinatorialAuction auctionGame = new CombinatorialAuction(TOTAL_PLAYER, TOTAL_GOODS);
+			CombinatorialAuction auctionGame = new CombinatorialAuction(TOTAL_PLAYER, TOTAL_GOODS, MEAN_WEIGHT_PER_GOOD, CHANCE);
 
 // Our heuristic and game method
 			totalPaymentDegree = 0;
@@ -45,20 +47,28 @@ public class Main {
 			Result_Of_Ours_Game += totalPaymentDegree;
 			
 			// print winner
-//			System.out.print("winner: ");
-//			for(Bidder bidder:bidders){
-//				System.out.print(bidder.getChoice() + " ");
-//			}
-//			System.out.println();
-			
-			// print payment
-			System.out.print("payment: ");
-			for(int i=0;i<TOTAL_PLAYER;i++){
-				if(bidders.get(i).getChoice() == 1) {
-					System.out.print((int)(bidders.get(i).getWeight()-bidders.get(i).getPaymentByDegree()) + " ");
-				}
+			System.out.print("winner: ");
+			for(Bidder bidder:bidders){
+				System.out.print(bidder.getChoice() + " ");
 			}
 			System.out.println();
+			
+			for(int i=0;i<TOTAL_PLAYER;i++) {
+				if(bidders.get(i).getChoice()==1){
+					System.out.print("bidder"+i+": ");
+					for(int j=0;j<TOTAL_GOODS;j++){
+						if(bidders.get(i).getBundle()[j]==1) System.out.print(j+",");
+					}
+					System.out.println();
+				}
+			}
+			
+			// print each winner's payment
+//			System.out.println("payment: ");
+//			for(Bidder bidder:bidders) {
+//				if(bidder.getChoice() == 1)	System.out.print((int)bidder.getPaymentByDegree() + " ");
+//			}
+//			System.out.println();
 			
 			// total sell
 			for(int i=0;i<TOTAL_PLAYER;i++){
@@ -84,20 +94,28 @@ public class Main {
 			Result_Of_LOS02_Game += totalPaymentGoods;
 			
 			// print winner
-//			System.out.print("winner: ");
-//			for(Bidder bidder:bidders){
-//				System.out.print(bidder.getChoice() + " ");
-//			}
-//			System.out.println();
-			
-			// print payment
-			System.out.print("payment: ");
-			for(int i=0;i<TOTAL_PLAYER;i++){
-				if(bidders.get(i).getChoice() == 1) {
-					System.out.print((int)(bidders.get(i).getWeight()-bidders.get(i).getPaymentByGoods()) + " ");
-				}
+			System.out.print("winner: ");
+			for(Bidder bidder:bidders){
+				System.out.print(bidder.getChoice() + " ");
 			}
 			System.out.println();
+			
+			for(int i=0;i<TOTAL_PLAYER;i++) {
+				if(bidders.get(i).getChoice()==1){
+					System.out.print("bidder"+i+": ");
+					for(int j=0;j<TOTAL_GOODS;j++){
+						if(bidders.get(i).getBundle()[j]==1) System.out.print(j+",");
+					}
+					System.out.println();
+				}
+			}
+			
+			// print each winner's payment
+//			System.out.println("payment: ");
+//			for(Bidder bidder:bidders) {
+//				if(bidder.getChoice()==1) System.out.print((int)bidder.getPaymentByGoods() + " ");
+//			}
+//			System.out.println();
 			
 			// print total sell
 			for(int i=0;i<TOTAL_PLAYER;i++){
@@ -111,11 +129,11 @@ public class Main {
 		}
 
 		System.out.println("ours_game: " + Result_Of_Ours_Game / TOTAL_FILES);
-//		System.out.println("sell: " + sell_Of_Ours_Game / TOTAL_FILES);
-//		System.out.println("winner: " + winner_Of_Ours_Game / TOTAL_FILES);
+		System.out.println("sell: " + sell_Of_Ours_Game / TOTAL_FILES);
+		System.out.println("winner: " + winner_Of_Ours_Game / TOTAL_FILES);
 		System.out.println("LOS02_game: " + Result_Of_LOS02_Game / TOTAL_FILES);
-//		System.out.println("sell: " + sell_Of_LOS02_Game / TOTAL_FILES);
-//		System.out.println("winner: " + winner_Of_LOS02_Game / TOTAL_FILES);
+		System.out.println("sell: " + sell_Of_LOS02_Game / TOTAL_FILES);
+		System.out.println("winner: " + winner_Of_LOS02_Game / TOTAL_FILES);
 		
 	}
 }
