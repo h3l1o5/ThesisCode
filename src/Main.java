@@ -12,10 +12,10 @@ public class Main {
 	private static final String ASYNC = "asynchronize";
 	private static final String GWMIN = "gwmin";
 	private static final String GWMIN2 = "gwmin2";
-	private static final int TOTAL_PLAYER = 10;
-	private static final int TOTAL_GOODS = 50;
-	private static final int TOTAL_FILES = 1;
-	private static final int CHANCE = 10;
+	private static final int TOTAL_PLAYER = 30;
+	private static final int TOTAL_GOODS = 300;
+	private static final int TOTAL_FILES = 2000;
+	private static final int CHANCE = 4;
 	private static final int MEAN_WEIGHT_PER_GOOD = 5000;
 
 	public static void main(String[] args) throws IOException {
@@ -47,21 +47,21 @@ public class Main {
 			Result_Of_Ours_Game += totalPaymentDegree;
 			
 			// print winner
-			System.out.print("winner: ");
-			for(Bidder bidder:bidders){
-				System.out.print(bidder.getChoice() + " ");
-			}
-			System.out.println();
-			
-			for(int i=0;i<TOTAL_PLAYER;i++) {
-				if(bidders.get(i).getChoice()==1){
-					System.out.print("bidder"+i+": ");
-					for(int j=0;j<TOTAL_GOODS;j++){
-						if(bidders.get(i).getBundle()[j]==1) System.out.print(j+",");
-					}
-					System.out.println();
-				}
-			}
+//			System.out.print("winner: ");
+//			for(Bidder bidder:bidders){
+//				System.out.print(bidder.getChoice() + " ");
+//			}
+//			System.out.println();
+//			
+//			for(int i=0;i<TOTAL_PLAYER;i++) {
+//				if(bidders.get(i).getChoice()==1){
+//					System.out.print("bidder"+i+": ");
+//					for(int j=0;j<TOTAL_GOODS;j++){
+//						if(bidders.get(i).getBundle()[j]==1) System.out.print(j+",");
+//					}
+//					System.out.println();
+//				}
+//			}
 			
 			// print each winner's payment
 //			System.out.println("payment: ");
@@ -94,21 +94,21 @@ public class Main {
 			Result_Of_LOS02_Game += totalPaymentGoods;
 			
 			// print winner
-			System.out.print("winner: ");
-			for(Bidder bidder:bidders){
-				System.out.print(bidder.getChoice() + " ");
-			}
-			System.out.println();
-			
-			for(int i=0;i<TOTAL_PLAYER;i++) {
-				if(bidders.get(i).getChoice()==1){
-					System.out.print("bidder"+i+": ");
-					for(int j=0;j<TOTAL_GOODS;j++){
-						if(bidders.get(i).getBundle()[j]==1) System.out.print(j+",");
-					}
-					System.out.println();
-				}
-			}
+//			System.out.print("winner: ");
+//			for(Bidder bidder:bidders){
+//				System.out.print(bidder.getChoice() + " ");
+//			}
+//			System.out.println();
+//			
+//			for(int i=0;i<TOTAL_PLAYER;i++) {
+//				if(bidders.get(i).getChoice()==1){
+//					System.out.print("bidder"+i+": ");
+//					for(int j=0;j<TOTAL_GOODS;j++){
+//						if(bidders.get(i).getBundle()[j]==1) System.out.print(j+",");
+//					}
+//					System.out.println();
+//				}
+//			}
 			
 			// print each winner's payment
 //			System.out.println("payment: ");

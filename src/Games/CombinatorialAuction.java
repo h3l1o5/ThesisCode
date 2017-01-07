@@ -361,24 +361,12 @@ public class CombinatorialAuction {
 	}
 
 	private int ourWinnerDetermination(int currentBidder) {
-		double m_current, m_compare;
-		int[] degree = new int[totalBidders];
-
-		for (int i = 0; i < totalBidders; i++) {
-			for (int j = 0; j < totalBidders; j++) {
-				if (conflictionMatrix[i][j] == 1)
-					degree[i]++;
-			}
-		}
-
-		m_current = (double) bidders.get(currentBidder).getWeight() / (degree[currentBidder] + 1);
-
+		
 		for (int i = 0; i < totalBidders; i++) {
 			if (conflictionMatrix[currentBidder][i] == 1 && bidders.get(i).getChoice() == 1) {
-				m_compare = (double) bidders.get(i).getWeight() / (degree[i] + 1);
-				if (m_compare > m_current)
+				if (bidders.get(i).getPriorityByDegreeAndSquare() > bidders.get(currentBidder).getPriorityByDegreeAndSquare())
 					return 0;
-				if (m_compare == m_current && bidders.get(i).getID() < bidders.get(currentBidder).getID())
+				if (bidders.get(i).getPriorityByDegreeAndSquare() == bidders.get(currentBidder).getPriorityByDegreeAndSquare() && bidders.get(i).getID() < bidders.get(currentBidder).getID())
 					return 0;
 			}
 		}
@@ -386,24 +374,12 @@ public class CombinatorialAuction {
 	}
 
 	private int LOS02WinnerDetermination(int currentBidder) {
-		double m_current, m_compare;
-		int[] goods = new int[totalBidders];
-
-		for (int i = 0; i < totalBidders; i++) {
-			for (int j = 0; j < totalGoods; j++) {
-				if (bidders.get(i).getBundle()[j] == 1)
-					goods[i]++;
-			}
-		}
-
-		m_current = (double) bidders.get(currentBidder).getWeight() / goods[currentBidder];
-
+		
 		for (int i = 0; i < totalBidders; i++) {
 			if (conflictionMatrix[currentBidder][i] == 1 && bidders.get(i).getChoice() == 1) {
-				m_compare = (double) bidders.get(i).getWeight() / goods[i];
-				if (m_compare > m_current)
+				if (bidders.get(i).getPriorityByGoodsAndSquare() > bidders.get(currentBidder).getPriorityByGoodsAndSquare())
 					return 0;
-				if (m_compare == m_current && bidders.get(i).getID() < bidders.get(currentBidder).getID())
+				if (bidders.get(i).getPriorityByGoodsAndSquare() == bidders.get(currentBidder).getPriorityByGoodsAndSquare() && bidders.get(i).getID() < bidders.get(currentBidder).getID())
 					return 0;
 			}
 		}
