@@ -12,8 +12,8 @@ public class Bidder extends Player {
 	private int[] bundle;
 	private int totalGoods;
 	
-	public Bidder(int ID,int size,double weight,int totalGoods){
-		super(ID, size,weight);
+	public Bidder(int ID, int size, int totalGoods){
+		super(ID, size);
 		this.totalGoods = totalGoods;
 		bundle = new int[totalGoods];
 	}

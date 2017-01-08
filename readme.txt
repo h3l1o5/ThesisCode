@@ -1,8 +1,10 @@
 current version:
 
-Combinatorial action game's winner determinate part is OK and payment algorithm is OK
+Combinatorial action game's winner determinate part is OK and payment algorithm is OK.
+Now we can decide the game is multi-unit or not.
 
 
 TODO:
 
-2. Multi unit winner determination & payment algo.
+1. double check
+2. repair centralized algo.

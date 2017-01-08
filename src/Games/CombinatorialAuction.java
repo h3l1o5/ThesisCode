@@ -20,21 +20,29 @@ public class CombinatorialAuction {
 	private int totalGoods;
 	private int totalBidders;
 	private int chance;
+	private boolean isMultiUnit;
+	private int amountRangeOfEachGood;
+	private int[] goodStore;
+	private int[] goodStoreOriginal;
 	private int[][] conflictionMatrix;
 	int[] degreeCountsOfEachBidder;
 	public int[] bundleCountsOfEachBidder;
 	List<Bidder> bidders;
 
-	public CombinatorialAuction(int size, int totalGoods, int meanWeightPerGood, int chance) {
+	public CombinatorialAuction(int size, int totalGoods, int weightBaseOfGoods, int weightRangeOfGoods, int chance, int amountRangeOfEachGood) {
 		this.totalBidders = size;
 		this.totalGoods = totalGoods;
 		this.chance = 100/chance;
+		this.amountRangeOfEachGood = amountRangeOfEachGood;
+		goodStore = new int[totalGoods];
+		goodStoreOriginal = new int[totalGoods];
 		conflictionMatrix = new int[size][size];
 		bundleCountsOfEachBidder = new int[size];
 		degreeCountsOfEachBidder = new int[size];
 		initBidders();
+		initGoodStore(isMultiUnit);
 		initBundlesAndConflictionMatrix();
-		initBidderWeight(meanWeightPerGood);
+		initBidderWeight(weightBaseOfGoods,weightRangeOfGoods);
 		randomizeBidderID();
 
 		for (int i = 0; i < size; i++) {
@@ -45,6 +53,10 @@ public class CombinatorialAuction {
 	
 	public List<Bidder> getBidders() {
 		return bidders;
+	}
+	
+	public int[] getGoodStoreOriginal(){
+		return goodStoreOriginal;
 	}
 
 	public void start(String winnerDeterminationAlgo, String type) {
@@ -60,8 +72,24 @@ public class CombinatorialAuction {
 	private void initBidders() {
 		bidders = new ArrayList<>();
 		for (int i = 0; i < totalBidders; i++) {
-			Bidder bidder = new Bidder(i, totalBidders, 1, totalGoods);
+			Bidder bidder = new Bidder(i, totalBidders, totalGoods);
 			bidders.add(bidder);
+		}
+	}
+	
+	private void initGoodStore(boolean isMultiUnit) {
+		if(amountRangeOfEachGood > 1) {
+			Random ran = new Random();
+			for(int i=0;i<totalGoods;i++){
+				int amount = ran.nextInt(amountRangeOfEachGood) + 1;
+				goodStore[i] = amount;
+				goodStoreOriginal[i] = amount;
+			}
+		} else {
+			for(int i=0;i<totalGoods;i++){
+				goodStore[i] = 1;
+				goodStoreOriginal[i] = 1;
+			}
 		}
 	}
 
@@ -73,17 +101,20 @@ public class CombinatorialAuction {
 			Bidder bidder = bidders.get(i);
 			for (int j = 0; j < totalGoods; j++) {
 				if (ran.nextInt(chance) % chance == 0) {
-					bidder.setBundle(j, 1);
-					bundleCountsOfEachBidder[i] ++ ;
+					int amountToTake = ran.nextInt(goodStore[j])+1;
+					bidder.setBundle(j, amountToTake);
+					bundleCountsOfEachBidder[i] += amountToTake;
 				}
 			}
 		}
 
 		// make a adjacency matrix represent of the confliction of every bidder
 		for (int i = 0; i < totalBidders; i++) {
+			Bidder bidder = bidders.get(i);
 			for (int j = i + 1; j < totalBidders; j++) {
+				Bidder bidder2 = bidders.get(j);
 				for (int k = 0; k < totalGoods; k++) {
-					if (bidders.get(i).getBundle()[k] == 1 && bidders.get(j).getBundle()[k] == 1) {
+					if (bidder.getBundle()[k] > 0 && bidder2.getBundle()[k] > 0) {
 						conflictionMatrix[i][j] = 1;
 						conflictionMatrix[j][i] = 1;
 						degreeCountsOfEachBidder[i] ++ ;
@@ -95,25 +126,26 @@ public class CombinatorialAuction {
 		}
 	}
 	
-	public void initBidderWeight(int goodWeightRange) {
+	public void initBidderWeight(int base, int range) {
 		Random ran = new Random();
-		int bidderWeight = 0;
+		int bidderWeight;
 		int[] weightOfGood = new int[totalGoods];
 		for (int i = 0; i < totalGoods; i++) {
-			weightOfGood[i] = ran.nextInt(goodWeightRange) + 1;
+			weightOfGood[i] = ran.nextInt(range) + base;
 		}
 		for (int i = 0; i < totalBidders; i++) {
+			Bidder bidder = bidders.get(i);
+			bidderWeight = 0;
 			for (int j = 0; j < totalGoods; j++) {
-				if (bidders.get(i).getBundle()[j] == 1) {
+				if (bidder.getBundle()[j] > 0) {
 					double normalRandomNumber = 0;
 					while (normalRandomNumber <= 0) {
 						normalRandomNumber = ran.nextGaussian() * (weightOfGood[j] / 5) + weightOfGood[j];
 					}
-					bidderWeight += normalRandomNumber;
+					bidderWeight += (normalRandomNumber*bidder.getBundle()[j]);
 				}
 			}
-			bidders.get(i).setWeight(bidderWeight);
-			bidderWeight = 0;
+			bidder.setWeight(bidderWeight);
 		}
 	}
 
@@ -129,6 +161,7 @@ public class CombinatorialAuction {
 		}
 	}
 	
+	// TODO: repair this
 	private void Centralized_aysnc() {
 		if (winnerDeterminationAlgo.equals("ours")) {
 
@@ -232,8 +265,19 @@ public class CombinatorialAuction {
 			for (int step = 1;; step++) {
 				flag = 0;
 				for (int i = 0; i < totalBidders; i++) {
+					Bidder bidder = bidders.get(i);
 					newDecision = ourWinnerDetermination(i);
-					if (bidders.get(i).getChoice() != newDecision) {
+					if (bidder.getChoice() != newDecision) {
+						if(newDecision == 0){
+							for(int j=0;j<totalGoods;j++){
+								goodStore[j] += bidder.getBundle()[j];
+							}
+						}
+						if(newDecision == 1){
+							for(int j=0;j<totalGoods;j++){
+								goodStore[j] -= bidder.getBundle()[j];
+							}
+						}		
 						bidders.get(i).setChoice(newDecision);
 						flag = 1;
 						break;
@@ -247,8 +291,19 @@ public class CombinatorialAuction {
 			for (int step = 1;; step++) {
 				flag = 0;
 				for (int i = 0; i < totalBidders; i++) {
+					Bidder bidder = bidders.get(i);
 					newDecision = LOS02WinnerDetermination(i);
-					if (bidders.get(i).getChoice() != newDecision) {
+					if (bidder.getChoice() != newDecision) {
+						if(newDecision == 0){
+							for(int j=0;j<totalGoods;j++){
+								goodStore[j] += bidder.getBundle()[j];
+							}
+						}
+						if(newDecision == 1){
+							for(int j=0;j<totalGoods;j++){
+								goodStore[j] -= bidder.getBundle()[j];
+							}
+						}							
 						bidders.get(i).setChoice(newDecision);
 						flag = 1;
 						break;
@@ -259,10 +314,14 @@ public class CombinatorialAuction {
 			}
 			calculateCriticalValue();
 		}
-		checkResult();
+		if(amountRangeOfEachGood == 1){
+			checkIndependentAndDomination();
+		} else {
+			checkGoodStore();
+		}
 	}
 
-	private void checkResult() {
+	private void checkIndependentAndDomination() {
 		int flag = 0;
 
 		for (int i = 0; i < totalBidders; i++) {
@@ -283,9 +342,18 @@ public class CombinatorialAuction {
 				}
 			}
 			if (flag == 1) {
-				System.out.println("不是independent");
+				System.out.println("not independent");
 			} else if (flag == 2) {
-				System.out.println("不是dominating");
+				System.out.println("not dominating");
+			}
+		}
+	}
+	
+	private void checkGoodStore(){
+		for(int i=0;i<totalGoods;i++){
+			if(goodStore[i]<0){
+				System.out.println("some goods <0");
+				break;
 			}
 		}
 	}
@@ -364,23 +432,70 @@ public class CombinatorialAuction {
 		
 		for (int i = 0; i < totalBidders; i++) {
 			if (conflictionMatrix[currentBidder][i] == 1 && bidders.get(i).getChoice() == 1) {
-				if (bidders.get(i).getPriorityByDegreeAndSquare() > bidders.get(currentBidder).getPriorityByDegreeAndSquare())
-					return 0;
-				if (bidders.get(i).getPriorityByDegreeAndSquare() == bidders.get(currentBidder).getPriorityByDegreeAndSquare() && bidders.get(i).getID() < bidders.get(currentBidder).getID())
-					return 0;
+				if (bidders.get(i).getPriorityByDegreeAndSquare() > bidders.get(currentBidder).getPriorityByDegreeAndSquare()){
+					if (bidders.get(currentBidder).getChoice()==1){
+						for(int j=0;j<totalGoods;j++){
+							if(bidders.get(currentBidder).getBundle()[j]>0 && bidders.get(i).getBundle()[j]>0 && goodStore[j]<0){
+								return 0;
+							}
+						}
+					} else {
+						for(int j=0;j<totalGoods;j++){
+							if(bidders.get(currentBidder).getBundle()[j]>0 && bidders.get(i).getBundle()[j]>0 && goodStore[j]-bidders.get(currentBidder).getBundle()[j]<0)
+								return 0;
+						}
+					}
+				}
+				if (bidders.get(i).getPriorityByDegreeAndSquare() == bidders.get(currentBidder).getPriorityByDegreeAndSquare() && bidders.get(i).getID() < bidders.get(currentBidder).getID()){
+					if (bidders.get(currentBidder).getChoice()==1){
+						for(int j=0;j<totalGoods;j++){
+							if(bidders.get(currentBidder).getBundle()[j]>0 && bidders.get(i).getBundle()[j]>0 && goodStore[j]<0){
+								return 0;
+							}
+						}
+					} else {
+						for(int j=0;j<totalGoods;j++){
+							if(bidders.get(currentBidder).getBundle()[j]>0 && bidders.get(i).getBundle()[j]>0 && goodStore[j]-bidders.get(currentBidder).getBundle()[j]<0)
+								return 0;
+						}
+					}					
+				}
 			}
 		}
 		return 1;
 	}
 
-	private int LOS02WinnerDetermination(int currentBidder) {
-		
+	private int LOS02WinnerDetermination(int currentBidder) {		
 		for (int i = 0; i < totalBidders; i++) {
 			if (conflictionMatrix[currentBidder][i] == 1 && bidders.get(i).getChoice() == 1) {
-				if (bidders.get(i).getPriorityByGoodsAndSquare() > bidders.get(currentBidder).getPriorityByGoodsAndSquare())
-					return 0;
-				if (bidders.get(i).getPriorityByGoodsAndSquare() == bidders.get(currentBidder).getPriorityByGoodsAndSquare() && bidders.get(i).getID() < bidders.get(currentBidder).getID())
-					return 0;
+				if (bidders.get(i).getPriorityByGoodsAndSquare() > bidders.get(currentBidder).getPriorityByGoodsAndSquare()){
+					if (bidders.get(currentBidder).getChoice()==1){
+						for(int j=0;j<totalGoods;j++){
+							if(bidders.get(currentBidder).getBundle()[j]>0 && bidders.get(i).getBundle()[j]>0 && goodStore[j]<0){
+								return 0;
+							}
+						}
+					} else {
+						for(int j=0;j<totalGoods;j++){
+							if(bidders.get(currentBidder).getBundle()[j]>0 && bidders.get(i).getBundle()[j]>0 && goodStore[j]-bidders.get(currentBidder).getBundle()[j]<0)
+								return 0;
+						}
+					}
+				}
+				if (bidders.get(i).getPriorityByGoodsAndSquare() == bidders.get(currentBidder).getPriorityByGoodsAndSquare() && bidders.get(i).getID() < bidders.get(currentBidder).getID()){
+					if (bidders.get(currentBidder).getChoice()==1){
+						for(int j=0;j<totalGoods;j++){
+							if(bidders.get(currentBidder).getBundle()[j]>0 && bidders.get(i).getBundle()[j]>0 && goodStore[j]<0){
+								return 0;
+							}
+						}
+					} else {
+						for(int j=0;j<totalGoods;j++){
+							if(bidders.get(currentBidder).getBundle()[j]>0 && bidders.get(i).getBundle()[j]>0 && goodStore[j]-bidders.get(currentBidder).getBundle()[j]<0)
+								return 0;
+						}
+					}					
+				}
 			}
 		}
 		return 1;
