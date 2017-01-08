@@ -15,8 +15,10 @@ public class Main {
 	private static final int TOTAL_PLAYER = 30;
 	private static final int TOTAL_GOODS = 300;
 	private static final int TOTAL_FILES = 2000;
-	private static final int CHANCE = 4;
-	private static final int MEAN_WEIGHT_PER_GOOD = 5000;
+	private static final int CHANCE = 5;
+	private static final int WEIGHT_BASE_OF_GOODS = 1000;
+	private static final int WEIGHT_RANGE_OF_GOODS = 1000;
+	private static final int AMOUNT_RANGE_OF_EACH_GOOD = 2;
 
 	public static void main(String[] args) throws IOException {
 
@@ -26,18 +28,24 @@ public class Main {
 		int sell_Of_LOS02_Game = 0;
 		int winner_Of_Ours_Game = 0;
 		int winner_Of_LOS02_Game = 0;
-
+		int good_amount = 0;
 
 		for (int file = 1; file <= TOTAL_FILES; file++) {
 			double totalPaymentDegree;
 			double totalPaymentGoods;
 			List<Bidder> bidders;
-			CombinatorialAuction auctionGame = new CombinatorialAuction(TOTAL_PLAYER, TOTAL_GOODS, MEAN_WEIGHT_PER_GOOD, CHANCE);
-
+			int[] goodStore;
+			CombinatorialAuction auctionGame = new CombinatorialAuction(TOTAL_PLAYER, TOTAL_GOODS, WEIGHT_BASE_OF_GOODS, WEIGHT_RANGE_OF_GOODS, CHANCE, AMOUNT_RANGE_OF_EACH_GOOD);
+			goodStore = auctionGame.getGoodStoreOriginal();
+			for(int i=0;i<TOTAL_GOODS;i++){
+				good_amount += goodStore[i];
+			}
+			
 // Our heuristic and game method
 			totalPaymentDegree = 0;
 			auctionGame.start("ours", "game");
 			bidders = auctionGame.getBidders();
+
 			totalPaymentDegree = 0;
 			for (Bidder bidder : bidders) {
 				if (bidder.getChoice() == 1) {
@@ -79,8 +87,14 @@ public class Main {
 			for(int i=0;i<TOTAL_PLAYER; i++){
 				if(bidders.get(i).getChoice() == 1) winner_Of_Ours_Game += 1;
 			}
-
 			
+			// print good store
+//			goodStore = auctionGame.getGoodStore();
+//			System.out.print("good store: ");
+//			for(int i=0;i<TOTAL_GOODS;i++){
+//				System.out.print(goodStore[i]+" ");
+//			}
+//			System.out.println();	
 
 // LOS02 heuristic and game method
 			totalPaymentGoods = 0;
@@ -126,12 +140,32 @@ public class Main {
 			for(int i=0;i<TOTAL_PLAYER; i++){
 				if(bidders.get(i).getChoice() == 1) winner_Of_LOS02_Game += 1;
 			}
+			
+			// print good store
+//			goodStore = auctionGame.getGoodStore();
+//			System.out.print("good store: ");
+//			for(int i=0;i<TOTAL_GOODS;i++){
+//				System.out.print(goodStore[i]+" ");
+//			}
+//			System.out.println();	
 		}
 
-		System.out.println("ours_game: " + Result_Of_Ours_Game / TOTAL_FILES);
+		
+		System.out.println("GAME SETTING : ");
+		System.out.println("bidders = " + TOTAL_PLAYER);
+		System.out.println("chance = " + CHANCE + "%");
+		System.out.println("good species = " + TOTAL_GOODS);
+		System.out.println("amount range of each good = " + AMOUNT_RANGE_OF_EACH_GOOD);
+		System.out.println("total goods = " + good_amount / TOTAL_FILES);
+		System.out.println("weight base of each good species = " + WEIGHT_BASE_OF_GOODS);
+		System.out.println("weight range of each good species = " + WEIGHT_RANGE_OF_GOODS);
+		System.out.println();
+		System.out.println("-----ours_game-----");
+		System.out.println("benifit: " + Result_Of_Ours_Game / TOTAL_FILES);
 		System.out.println("sell: " + sell_Of_Ours_Game / TOTAL_FILES);
 		System.out.println("winner: " + winner_Of_Ours_Game / TOTAL_FILES);
-		System.out.println("LOS02_game: " + Result_Of_LOS02_Game / TOTAL_FILES);
+		System.out.println("-----LOS02_game-----");
+		System.out.println("benifit: " + Result_Of_LOS02_Game / TOTAL_FILES);
 		System.out.println("sell: " + sell_Of_LOS02_Game / TOTAL_FILES);
 		System.out.println("winner: " + winner_Of_LOS02_Game / TOTAL_FILES);
 		

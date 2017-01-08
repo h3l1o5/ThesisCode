@@ -11,6 +11,11 @@ public class Player {
 		this.weight = weight;
 		neighbors = new int[size];
 	}
+	
+	public Player(int ID, int size){
+		this.ID = ID;
+		neighbors = new int[size];
+	}
 
 	public int getID() {
 		return ID;
