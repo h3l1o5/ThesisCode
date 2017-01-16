@@ -16,11 +16,19 @@ public class Main {
 	private static final int TOTAL_GOODS = 300;
 	private static final int TOTAL_FILES = 2000;
 	private static final int CHANCE = 5;
-	private static final int WEIGHT_BASE_OF_GOODS = 1000;
-	private static final int WEIGHT_RANGE_OF_GOODS = 1000;
-	private static final int AMOUNT_RANGE_OF_EACH_GOOD = 2;
+	private static final int WEIGHT_BASE_OF_GOODS = 500;
+	private static final int WEIGHT_RANGE_OF_GOODS = 100;
+	private static final int AMOUNT_RANGE_OF_EACH_GOOD = 1;
 
 	public static void main(String[] args) throws IOException {
+		
+		// test
+		Test test = new Test();
+		test.startSingleUnitTest();
+		System.out.println("-----------------------------------------------------------------------------");
+		test.startMultiUnitTest();
+		System.out.println("-----------------------------------------------------------------------------");
+
 
 		int Result_Of_Ours_Game = 0;
 		int Result_Of_LOS02_Game = 0;
@@ -29,7 +37,6 @@ public class Main {
 		int winner_Of_Ours_Game = 0;
 		int winner_Of_LOS02_Game = 0;
 		int good_amount = 0;
-
 		for (int file = 1; file <= TOTAL_FILES; file++) {
 			double totalPaymentDegree;
 			double totalPaymentGoods;
@@ -40,7 +47,7 @@ public class Main {
 			for(int i=0;i<TOTAL_GOODS;i++){
 				good_amount += goodStore[i];
 			}
-			
+
 // Our heuristic and game method
 			totalPaymentDegree = 0;
 			auctionGame.start("ours", "game");
@@ -99,7 +106,6 @@ public class Main {
 // LOS02 heuristic and game method
 			totalPaymentGoods = 0;
 			auctionGame.start("LOS02", "game");
-			bidders = auctionGame.getBidders();
 			for (Bidder bidder : bidders) {
 				if (bidder.getChoice() == 1) {
 					totalPaymentGoods += bidder.getPaymentByGoods();

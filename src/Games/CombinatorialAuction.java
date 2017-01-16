@@ -44,11 +44,19 @@ public class CombinatorialAuction {
 		initBundlesAndConflictionMatrix();
 		initBidderWeight(weightBaseOfGoods,weightRangeOfGoods);
 		randomizeBidderID();
-
-		for (int i = 0; i < size; i++) {
-			bidders.get(i).setPriorityByDegreeAndSquare((double) bidders.get(i).getWeight() / (degreeCountsOfEachBidder[i]+1));
-			bidders.get(i).setPriorityByGoodsAndSquare((double) bidders.get(i).getWeight() / (bundleCountsOfEachBidder[i]));
-		}
+	}
+	
+/*getters and setters*/
+	public void setConlictionMatrix(int[][] martrix) {
+		conflictionMatrix = martrix;
+	}
+	
+	public void setBundleCountsOfEachBidder(int[] bundleCount) {
+		bundleCountsOfEachBidder = bundleCount;
+	}
+	
+	public void setDegreeCountsOfEachBidder(int[] degreeCount) {
+		degreeCountsOfEachBidder = degreeCount;
 	}
 	
 	public List<Bidder> getBidders() {
@@ -58,10 +66,36 @@ public class CombinatorialAuction {
 	public int[] getGoodStoreOriginal(){
 		return goodStoreOriginal;
 	}
+	
+	public void setGoodStore(int[] goodStore){
+		this.goodStore = goodStore;
+	}
+	
+	public void setGoodStoreOriginal(){
+		for(int i=0;i<totalGoods;i++){
+			goodStoreOriginal[i] = goodStore[i];
+		}
+	}
+/*getters and setters*/
 
 	public void start(String winnerDeterminationAlgo, String type) {
+		for (int i = 0; i < totalBidders; i++) {
+			bidders.get(i).setPriorityByDegreeAndSquare((double) bidders.get(i).getWeight() / Math.sqrt(degreeCountsOfEachBidder[i]+1));
+			bidders.get(i).setPriorityByGoodsAndSquare((double) bidders.get(i).getWeight() / Math.sqrt(bundleCountsOfEachBidder[i]));
+		}
+		
 		this.type = type;
 		this.winnerDeterminationAlgo = winnerDeterminationAlgo;
+		
+		// reset good store
+		for(int i=0;i<totalGoods;i++){
+			goodStore[i] = goodStoreOriginal[i];
+		}
+		// reset bidder's choice
+		for(Bidder bidder:bidders){
+			bidder.setChoice(0);
+		}
+		
 		if (type.equals("game")) {
 			Game_async();
 		} else {
@@ -363,17 +397,17 @@ public class CombinatorialAuction {
 			for(int i=0; i<totalBidders; i++){
 				// winner
 				if (bidders.get(i).getChoice() == 1) {
-					double temp=999999999;
+					double temp=-1;
 					bidders.get(i).setChoice(0);
 					for(int j=0; j<totalBidders; j++){
-						if(conflictionMatrix[i][j]==1) {
-							if(ourWinnerDetermination(j) == 1 && bidders.get(j).getPriorityByDegreeAndSquare()<temp) {
+						if(conflictionMatrix[i][j]==1 && bidders.get(j).getChoice()==0) {
+							if(ourWinnerDetermination(j) == 1 && bidders.get(j).getPriorityByDegreeAndSquare()>temp) {
 								temp = bidders.get(j).getPriorityByDegreeAndSquare();
 							}
 						}
 					}
 					bidders.get(i).setChoice(1);
-					if(temp>999999998){
+					if(temp==-1){
 						bidders.get(i).setPaymentByDegree(0);
 						bidders.get(i).setCriticalValue(0);
 					} else {
@@ -384,8 +418,12 @@ public class CombinatorialAuction {
 					double temp = 999999999;
 					for(int j=0; j<totalBidders; j++){
 						if (conflictionMatrix[i][j] == 1 && bidders.get(j).getChoice() == 1){
-							if (bidders.get(j).getPriorityByDegreeAndSquare() < temp)
-								temp = bidders.get(j).getPriorityByDegreeAndSquare();
+							bidders.get(j).setChoice(0);
+							if(ourWinnerDetermination(i)==1){
+								if(bidders.get(j).getPriorityByDegreeAndSquare()<temp)
+									temp = bidders.get(j).getPriorityByDegreeAndSquare();
+							}
+							bidders.get(j).setChoice(1);
 						}
 					}
 					bidders.get(i).setCriticalValue(temp * Math.sqrt(degreeCountsOfEachBidder[i]+1));
@@ -396,17 +434,17 @@ public class CombinatorialAuction {
 			for(int i=0; i<totalBidders; i++){
 				// winner
 				if (bidders.get(i).getChoice() == 1) {
-					double temp=999999999;
+					double temp=-1;
 					bidders.get(i).setChoice(0);
 					for(int j=0; j<totalBidders; j++){
-						if(conflictionMatrix[i][j]==1) {
-							if(LOS02WinnerDetermination(j) == 1 && bidders.get(j).getPriorityByGoodsAndSquare()<temp) {
+						if(conflictionMatrix[i][j]==1 && bidders.get(j).getChoice()==0) {
+							if(LOS02WinnerDetermination(j) == 1 && bidders.get(j).getPriorityByGoodsAndSquare()>temp) {
 								temp = bidders.get(j).getPriorityByGoodsAndSquare();
 							}
 						}
 					}
 					bidders.get(i).setChoice(1);
-					if(temp>999999998){
+					if(temp==-1){
 						bidders.get(i).setPaymentByGoods(0);
 						bidders.get(i).setCriticalValue(0);
 					} else {
@@ -417,8 +455,12 @@ public class CombinatorialAuction {
 					double temp = 999999999;
 					for(int j=0; j<totalBidders; j++){
 						if (conflictionMatrix[i][j] == 1 && bidders.get(j).getChoice() == 1){
-							if (bidders.get(j).getPriorityByGoodsAndSquare() < temp)
-								temp = bidders.get(j).getPriorityByGoodsAndSquare();
+							bidders.get(j).setChoice(0);
+							if(LOS02WinnerDetermination(i)==1){
+								if(bidders.get(j).getPriorityByGoodsAndSquare()<temp)
+									temp = bidders.get(j).getPriorityByGoodsAndSquare();
+							}
+							bidders.get(j).setChoice(1);
 						}
 					}
 					bidders.get(i).setCriticalValue(temp * Math.sqrt(bundleCountsOfEachBidder[i]));
