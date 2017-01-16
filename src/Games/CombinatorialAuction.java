@@ -76,6 +76,18 @@ public class CombinatorialAuction {
 			goodStoreOriginal[i] = goodStore[i];
 		}
 	}
+	
+	public double getDensityOfGraph(){
+		int edges=0;
+		for(int i=0;i<totalBidders;i++){
+			for(int j=0;j<totalBidders;j++){
+				if(conflictionMatrix[i][j]==1)
+					edges += 1;
+			}
+		}
+		edges = edges/2;
+		return (double)edges/(totalBidders*(totalBidders-1)/2);
+	}
 /*getters and setters*/
 
 	public void start(String winnerDeterminationAlgo, String type) {
@@ -150,7 +162,9 @@ public class CombinatorialAuction {
 				for (int k = 0; k < totalGoods; k++) {
 					if (bidder.getBundle()[k] > 0 && bidder2.getBundle()[k] > 0) {
 						conflictionMatrix[i][j] = 1;
+						bidder.setNeighbors(j, 1);
 						conflictionMatrix[j][i] = 1;
+						bidder2.setNeighbors(i, 1);
 						degreeCountsOfEachBidder[i] ++ ;
 						degreeCountsOfEachBidder[j] ++ ;
 						break;

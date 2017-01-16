@@ -4,7 +4,7 @@ Combinatorial action game's winner determinate part is OK and payment algorithm 
 Now we can decide the game is multi-unit or not.
 
 update:
-Add testing.
+Add density.
 
 
 TODO:
