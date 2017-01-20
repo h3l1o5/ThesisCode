@@ -1,23 +1,65 @@
 package Model;
 
-import org.omg.PortableServer.AdapterActivator;
-
-public class Bidder extends Player {
-	private double priorityByGoodsAndSquare;
-	private double priorityByDegreeAndSquare;
-	private double paymentByDegree;
-	private double paymentByGoods;
-	private double criticalValue;
-
+public class Bidder {
+	private int ID;
+	private int choice;
+	private int[] neighbors;
 	private int[] bundle;
 	private int totalGoods;
+	private int totalBidders;
+	private double weight;
+	private double priority;
+	private double payment;
+	private double criticalValue;
 	
-	public Bidder(int ID, int size, int totalGoods){
-		super(ID, size);
+	public Bidder(int ID, int totalBidders, int totalGoods){
+		this.ID = ID;
 		this.totalGoods = totalGoods;
+		this.totalBidders = totalBidders;
 		bundle = new int[totalGoods];
+		neighbors = new int[totalBidders];
 	}
 	
+	public int getID() {
+		return ID;
+	}
+
+	public void setID(int iD) {
+		ID = iD;
+	}
+
+	public int getChoice() {
+		return choice;
+	}
+
+	public void setChoice(int choice) {
+		this.choice = choice;
+	}
+	
+	public double getWeight() {
+		return weight;
+	}
+
+	public void setWeight(double weight) {
+		this.weight = weight;
+	}
+
+	public double getPriority() {
+		return priority;
+	}
+
+	public void setPriority(double priority) {
+		this.priority = priority;
+	}
+
+	public double getPayment() {
+		return payment;
+	}
+
+	public void setPayment(double payment) {
+		this.payment = payment;
+	}
+
 	public double getCriticalValue() {
 		return criticalValue;
 	}
@@ -25,42 +67,10 @@ public class Bidder extends Player {
 		this.criticalValue = criticalValue;
 	}
 
-	public double getPriorityByGoodsAndSquare() {
-		return priorityByGoodsAndSquare;
-	}
-
-	public void setPriorityByGoodsAndSquare(double PriorityByGoodsAndSquare) {
-		this.priorityByGoodsAndSquare = PriorityByGoodsAndSquare;
-	}
-
-	public double getPriorityByDegreeAndSquare() {
-		return priorityByDegreeAndSquare;
-	}
-
-	public void setPriorityByDegreeAndSquare(double PriorityByDegreeAndSquare) {
-		this.priorityByDegreeAndSquare = PriorityByDegreeAndSquare;
-	}
-
-	public double getPaymentByDegree() {
-		return paymentByDegree;
-	}
-
-	public void setPaymentByDegree(double payment) {
-		paymentByDegree = payment;
-	}
-
-	public double getPaymentByGoods() {
-		return paymentByGoods;
-	}
-
-	public void setPaymentByGoods(double paymentByGoods) {
-		this.paymentByGoods = paymentByGoods;
-	}
-
 	public int getBundleCount() {
 		int count=0;
 		for(int i=0;i<totalGoods;i++){
-			if(bundle[i]==1) count++;
+			if(bundle[i]>=1) count += bundle[i];
 		}
 		return count;
 	}
@@ -71,5 +81,21 @@ public class Bidder extends Player {
 
 	public void setBundle(int position, int choose) {
 		bundle[position] = choose;
+	}
+	
+	public int getNeighborCount() {
+		int count=0;
+		for(int i=0;i<totalBidders;i++){
+			if(neighbors[i]==1) count++;
+		}
+		return count;
+	}
+	
+	public int[] getNeighbors() {
+		return neighbors;
+	}
+
+	public void setNeighbors(int position,int isNeighbor) {
+		neighbors[position] = isNeighbor;
 	}
 }

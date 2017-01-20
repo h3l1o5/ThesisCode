@@ -1,7 +1,7 @@
 import java.util.List;
 
-import Games.CombinatorialAuction;
 import Model.Bidder;
+import Problems.CombinatorialAuction;
 
 public class Test {
 	private List<Bidder> bidders;
@@ -11,9 +11,10 @@ public class Test {
 		bidders = gameForTest.getBidders();
 		prepareBundleSingle();
 		prepareWeight();
-		gameForTest.setConlictionMatrix(prepareConflictionMatrix());
-		gameForTest.setDegreeCountsOfEachBidder(prepareDegreeCountsOfEachBidder());
-		gameForTest.setBundleCountsOfEachBidder(prepareBundleCountsOfEachBidderSingle());
+		prepareNeighbors();
+		gameForTest.setConflictionMatrix(prepareConflictionMatrix());
+		gameForTest.setGoodStore(prepareGoodsSingle());
+		gameForTest.setGoodStoreOriginal();
 		
 		gameForTest.start("ours", "game");
 		System.out.println("/Single-Unit test result of ours algo/");
@@ -51,9 +52,8 @@ public class Test {
 		bidders = gameForTest.getBidders();
 		prepareBundleMulti();
 		prepareWeight();
-		gameForTest.setConlictionMatrix(prepareConflictionMatrix());
-		gameForTest.setDegreeCountsOfEachBidder(prepareDegreeCountsOfEachBidder());
-		gameForTest.setBundleCountsOfEachBidder(prepareBundleCountsOfEachBidderMulti());
+		prepareNeighbors();
+		gameForTest.setConflictionMatrix(prepareConflictionMatrix());
 		gameForTest.setGoodStore(prepareGoodsMulti());
 		gameForTest.setGoodStoreOriginal();
 		
@@ -160,6 +160,38 @@ public class Test {
 		bidders.get(4).setWeight(17);
 	}
 	
+	private void prepareNeighbors() {
+		bidders.get(0).setNeighbors(0, 0);
+		bidders.get(0).setNeighbors(1, 1);
+		bidders.get(0).setNeighbors(2, 1);
+		bidders.get(0).setNeighbors(3, 1);
+		bidders.get(0).setNeighbors(4, 1);
+		
+		bidders.get(1).setNeighbors(0, 1);
+		bidders.get(1).setNeighbors(1, 0);
+		bidders.get(1).setNeighbors(2, 1);
+		bidders.get(1).setNeighbors(3, 0);
+		bidders.get(1).setNeighbors(4, 1);
+		
+		bidders.get(2).setNeighbors(0, 1);
+		bidders.get(2).setNeighbors(1, 1);
+		bidders.get(2).setNeighbors(2, 0);
+		bidders.get(2).setNeighbors(3, 1);
+		bidders.get(2).setNeighbors(4, 0);
+		
+		bidders.get(3).setNeighbors(0, 1);
+		bidders.get(3).setNeighbors(1, 0);
+		bidders.get(3).setNeighbors(2, 1);
+		bidders.get(3).setNeighbors(3, 0);
+		bidders.get(3).setNeighbors(4, 0);
+		
+		bidders.get(4).setNeighbors(0, 1);
+		bidders.get(4).setNeighbors(1, 1);
+		bidders.get(4).setNeighbors(2, 0);
+		bidders.get(4).setNeighbors(3, 0);
+		bidders.get(4).setNeighbors(4, 0);		
+	}
+	
 	private int[][] prepareConflictionMatrix(){
 		int[][] confMatrix = new int[5][5];
 		confMatrix[0][0] = 0;
@@ -173,24 +205,28 @@ public class Test {
 		confMatrix[1][2] = 1;
 		confMatrix[1][3] = 0;
 		confMatrix[1][4] = 1;
+
 		
 		confMatrix[2][0] = 1;
 		confMatrix[2][1] = 1;
 		confMatrix[2][2] = 0;
 		confMatrix[2][3] = 1;
 		confMatrix[2][4] = 0;
+
 		
 		confMatrix[3][0] = 1;
 		confMatrix[3][1] = 0;
 		confMatrix[3][2] = 1;
 		confMatrix[3][3] = 0;
 		confMatrix[3][4] = 0;
+
 		
 		confMatrix[4][0] = 1;
 		confMatrix[4][1] = 1;
 		confMatrix[4][2] = 0;
 		confMatrix[4][3] = 0;
 		confMatrix[4][4] = 0;
+
 		
 		return confMatrix;
 	}
@@ -226,6 +262,17 @@ public class Test {
 		BC[4] = 4;
 		
 		return BC;
+	}
+	
+	private int[] prepareGoodsSingle() {
+		int[] goods = new int[5];
+		goods[0] = 1;
+		goods[1] = 1;
+		goods[2] = 1;
+		goods[3] = 1;
+		goods[4] = 1;
+		
+		return goods;		
 	}
 	
 	private int[] prepareGoodsMulti(){
