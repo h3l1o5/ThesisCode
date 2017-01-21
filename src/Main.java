@@ -6,7 +6,7 @@ import Problems.CombinatorialAuction;
 import java.io.IOException;
 
 public class Main {
-	private static final int TOTAL_PLAYER = 20;
+	private static final int TOTAL_PLAYER = 30;
 	private static final int TOTAL_GOODS = 300;
 	private static final int TOTAL_FILES = 1;
 	private static final int CHANCE = 5;

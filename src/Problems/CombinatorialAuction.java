@@ -337,7 +337,7 @@ public class CombinatorialAuction {
 		}	
 	}
 	
-	private int makeNewDecition(int serialNumberOfCurrentBidder) {
+	private int makeNewDecition2(int serialNumberOfCurrentBidder) {
 		Bidder currentBidder = bidders.get(serialNumberOfCurrentBidder);
 		for (int i = 0; i < totalBidders; i++) {
 			if (conflictionMatrix[serialNumberOfCurrentBidder][i] == 1 && bidders.get(i).getChoice() == 1) {
@@ -355,6 +355,30 @@ public class CombinatorialAuction {
 								return 0;
 						}
 					}
+				}
+			}
+		}
+		return 1;
+	}
+	
+	private int makeNewDecition(int serialNumberOfCurrentBidder){
+		Bidder currentBidder = bidders.get(serialNumberOfCurrentBidder);
+		for(int i=0;i<totalGoods;i++){
+			if (currentBidder.getBundle()[i]>0){
+				int instanceCountOfThisGood = goodStoreOriginal[i];
+				int totalNeededOfThisGood = currentBidder.getBundle()[i];
+				
+				for(int j=0;j<totalBidders;j++){
+					if(currentBidder.getNeighbors()[j] == 1 && bidders.get(j).getChoice() == 1){
+						Bidder competitor = bidders.get(j);
+						if (competitor.getPriority() > currentBidder.getPriority() || (competitor.getPriority() == currentBidder.getPriority() && competitor.getID() < currentBidder.getID())){
+							totalNeededOfThisGood += competitor.getBundle()[i];
+						}
+					}
+				}
+				
+				if (totalNeededOfThisGood > instanceCountOfThisGood){
+					return 0;
 				}
 			}
 		}
