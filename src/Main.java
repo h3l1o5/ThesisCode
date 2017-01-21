@@ -1,20 +1,14 @@
 import java.util.List;
 
-import Games.CombinatorialAuction;
-import Games.FindMaximalIndepentSet;
 import Model.Bidder;
-import Model.Player;
+import Problems.CombinatorialAuction;
+
 import java.io.IOException;
 
 public class Main {
-	private static final String FIND_MAXIMAL_INDEPENDENT_SET = "find maximal independent set";
-	private static final String SYNC = "synchronize";
-	private static final String ASYNC = "asynchronize";
-	private static final String GWMIN = "gwmin";
-	private static final String GWMIN2 = "gwmin2";
-	private static final int TOTAL_PLAYER = 20;
+	private static final int TOTAL_PLAYER = 30;
 	private static final int TOTAL_GOODS = 300;
-	private static final int TOTAL_FILES = 2000;
+	private static final int TOTAL_FILES = 1;
 	private static final int CHANCE = 5;
 	private static final int WEIGHT_BASE_OF_GOODS = 1000;
 	private static final int WEIGHT_RANGE_OF_GOODS = 500;
@@ -63,7 +57,7 @@ public class Main {
 			totalPaymentDegree = 0;
 			for (Bidder bidder : bidders) {
 				if (bidder.getChoice() == 1) {
-					totalPaymentDegree += bidder.getPaymentByDegree();
+					totalPaymentDegree += bidder.getPayment();
 				}
 			}
 			Result_Of_Ours_Game += totalPaymentDegree;
@@ -99,7 +93,7 @@ public class Main {
 //			
 			// total sell
 			for(int i=0;i<TOTAL_PLAYER;i++){
-				if(bidders.get(i).getChoice() == 1) sell_Of_Ours_Game += auctionGame.bundleCountsOfEachBidder[i];
+				if(bidders.get(i).getChoice() == 1) sell_Of_Ours_Game += bidders.get(i).getBundleCount();
 			}
 			
 			// total winner
@@ -113,7 +107,7 @@ public class Main {
 			auctionGame.start("LOS02", "game");
 			for (Bidder bidder : bidders) {
 				if (bidder.getChoice() == 1) {
-					totalPaymentGoods += bidder.getPaymentByGoods();
+					totalPaymentGoods += bidder.getPayment();
 				}
 			}
 			Result_Of_LOS02_Game += totalPaymentGoods;
@@ -149,7 +143,7 @@ public class Main {
 //			
 			// print total sell
 			for(int i=0;i<TOTAL_PLAYER;i++){
-				if(bidders.get(i).getChoice() == 1) sell_Of_LOS02_Game += auctionGame.bundleCountsOfEachBidder[i];
+				if(bidders.get(i).getChoice() == 1) sell_Of_LOS02_Game += bidders.get(i).getBundleCount();
 			}
 			
 			// total winner
@@ -159,25 +153,25 @@ public class Main {
 		}
 
 		
-		System.out.println("GAME SETTING : ");
-		System.out.println("bidders = " + TOTAL_PLAYER);
-		System.out.println("chance = " + CHANCE + "%");
-		System.out.println("good species = " + TOTAL_GOODS);
-		System.out.println("amount range of each good = " + AMOUNT_RANGE_OF_EACH_GOOD);
-		System.out.println("total goods = " + good_amount / TOTAL_FILES);
-		System.out.println("weight base of each good species = " + WEIGHT_BASE_OF_GOODS);
-		System.out.println("weight range of each good species = " + WEIGHT_RANGE_OF_GOODS);
-		System.out.println("density = " + (density_Of_Graph/TOTAL_FILES)*100 + "%");
-		System.out.println();
-		System.out.println("-----ours_game-----");
-		System.out.println("benifit: " + Result_Of_Ours_Game / TOTAL_FILES);
-		System.out.println("sell: " + sell_Of_Ours_Game / TOTAL_FILES);
-		System.out.println("winner: " + winner_Of_Ours_Game / TOTAL_FILES);
-		System.out.println("neighborCountOfWinners: " + neighborOfWinner_Ours / TOTAL_FILES);
-		System.out.println("-----LOS02_game-----");
-		System.out.println("benifit: " + Result_Of_LOS02_Game / TOTAL_FILES);
-		System.out.println("sell: " + sell_Of_LOS02_Game / TOTAL_FILES);
-		System.out.println("winner: " + winner_Of_LOS02_Game / TOTAL_FILES);
-		System.out.println("neighborCountOfWinners: " + neighborOfWinner_LOS02 / TOTAL_FILES );
+//		System.out.println("GAME SETTING : ");
+//		System.out.println("bidders = " + TOTAL_PLAYER);
+//		System.out.println("chance = " + CHANCE + "%");
+//		System.out.println("good species = " + TOTAL_GOODS);
+//		System.out.println("amount range of each good = " + AMOUNT_RANGE_OF_EACH_GOOD);
+//		System.out.println("total goods = " + good_amount / TOTAL_FILES);
+//		System.out.println("weight base of each good species = " + WEIGHT_BASE_OF_GOODS);
+//		System.out.println("weight range of each good species = " + WEIGHT_RANGE_OF_GOODS);
+//		System.out.println("density = " + (density_Of_Graph/TOTAL_FILES)*100 + "%");
+//		System.out.println();
+//		System.out.println("-----ours_game-----");
+//		System.out.println("benifit: " + Result_Of_Ours_Game / TOTAL_FILES);
+//		System.out.println("sell: " + sell_Of_Ours_Game / TOTAL_FILES);
+//		System.out.println("winner: " + winner_Of_Ours_Game / TOTAL_FILES);
+//		System.out.println("neighborCountOfWinners: " + neighborOfWinner_Ours / TOTAL_FILES);
+//		System.out.println("-----LOS02_game-----");
+//		System.out.println("benifit: " + Result_Of_LOS02_Game / TOTAL_FILES);
+//		System.out.println("sell: " + sell_Of_LOS02_Game / TOTAL_FILES);
+//		System.out.println("winner: " + winner_Of_LOS02_Game / TOTAL_FILES);
+//		System.out.println("neighborCountOfWinners: " + neighborOfWinner_LOS02 / TOTAL_FILES );
 	}
 }
