@@ -193,18 +193,19 @@ public class CombinatorialAuction {
 	private void Game_async(String winnerDeterminationAlgo) {
 		int flag;
 		int newDecision;
-		if (winnerDeterminationAlgo.equals("ours")) {
-			for (int i = 0; i < totalBidders; i++) {
-				bidders.get(i).setPriority((double) bidders.get(i).getWeight() / Math.sqrt(bidders.get(i).getNeighborCount()+1));
-			}
-		} else if (winnerDeterminationAlgo.equals("LOS02")){
-			for (int i = 0; i < totalBidders; i++) {
-				bidders.get(i).setPriority((double) bidders.get(i).getWeight() / Math.sqrt(bidders.get(i).getBundleCount()));
-			}
-		} else {
-			System.out.println("winner determination algo must be \"ours\" or \"LOS02\"");
-			return;
-		}
+//		if (winnerDeterminationAlgo.equals("ours")) {
+//			for (int i = 0; i < totalBidders; i++) {
+//				bidders.get(i).setPriority((double) bidders.get(i).getWeight() / Math.sqrt(bidders.get(i).getNeighborCount()+1));
+//			}
+//		} else if (winnerDeterminationAlgo.equals("LOS02")){
+//			for (int i = 0; i < totalBidders; i++) {
+//				bidders.get(i).setPriority((double) bidders.get(i).getWeight() / Math.sqrt(bidders.get(i).getBundleCount()));
+//			}
+//		} else {
+//			System.out.println("winner determination algo must be \"ours\" or \"LOS02\"");
+//			return;
+//		}
+		calculatePriority(winnerDeterminationAlgo);
 		
 		for (int step = 1;; step++) {
 			flag = 0;
@@ -274,6 +275,40 @@ public class CombinatorialAuction {
 		}
 	}
 	
+	private void calculatePriority(String winnerDeterminationAlgo) {
+		if (winnerDeterminationAlgo.equals("LOS02")) {
+			for (int i = 0; i < totalBidders; i++) {
+				bidders.get(i).setPriority((double) bidders.get(i).getWeight() / Math.sqrt(bidders.get(i).getBundleCount()));
+			}
+		} else if (winnerDeterminationAlgo.equals("ours")) {
+			for (int i = 0; i < totalBidders; i++){
+				Bidder bidder = bidders.get(i);
+				bidder.setPriority((double) bidder.getWeight() / Math.sqrt(bidder.getBundleCount()*(bidder.getNeighborCount()+1)));
+//				Bidder bidder = bidders.get(i);
+//				double weightOfEdges = 0;
+//				for (int j=0;j<totalBidders;j++){
+//					if (bidder.getNeighbors()[j] == 1) {
+//						Bidder neighbor = bidders.get(j);
+//						double maxMeanOfInstanceCountOfCommonGood = 0;
+//						for (int k=0;k<totalGoods;k++){
+//							if (bidder.getBundle()[k]>0 && neighbor.getBundle()[k]>0) {
+//								double meanInstanceCountOfThisGood = (bidder.getBundle()[k] + neighbor.getBundle()[k]) / 2;
+//								if (meanInstanceCountOfThisGood > maxMeanOfInstanceCountOfCommonGood) maxMeanOfInstanceCountOfCommonGood = meanInstanceCountOfThisGood;
+//							}
+//						}
+//						weightOfEdges += maxMeanOfInstanceCountOfCommonGood;
+//					}
+//				}
+//				
+//				bidder.setWeightOfEdges(weightOfEdges);
+//				bidder.setPriority((double) bidder.getWeight() / Math.sqrt(weightOfEdges+1));
+			}
+		} else {
+			// left blank
+			return;
+		}
+	}
+	
 	private void calculateCriticalValue(String winnerDeterminationAlgo) {
 		for(int i=0; i<totalBidders; i++){
 			// calculation for winners
@@ -297,8 +332,10 @@ public class CombinatorialAuction {
 					winner.setCriticalValue(0);
 				} else {
 					if (winnerDeterminationAlgo.equals("ours")){
-						winner.setPayment(temp * Math.sqrt(winner.getNeighborCount()+1));
-						winner.setCriticalValue(temp * Math.sqrt(winner.getNeighborCount()+1));						
+//						winner.setPayment(temp * Math.sqrt(winner.getWeightOfEdges()+1));
+//						winner.setCriticalValue(temp * Math.sqrt(winner.getWeightOfEdges()+1));
+						winner.setPayment(temp * Math.sqrt(winner.getBundleCount()*(winner.getNeighborCount()+1)));
+						winner.setCriticalValue(temp * Math.sqrt(winner.getBundleCount()*(winner.getNeighborCount()+1)));	
 					} else if (winnerDeterminationAlgo.equals("LOS02")){
 						winner.setPayment(temp * Math.sqrt(winner.getBundleCount()));
 						winner.setCriticalValue(temp * Math.sqrt(winner.getBundleCount()));						
@@ -324,7 +361,8 @@ public class CombinatorialAuction {
 				}
 				
 				if (winnerDeterminationAlgo.equals("ours")) {
-					loser.setCriticalValue(temp * Math.sqrt(loser.getNeighborCount()+1));					
+//					loser.setCriticalValue(temp * Math.sqrt(loser.getWeightOfEdges()+1));
+					loser.setCriticalValue(temp * Math.sqrt(loser.getBundleCount()*(loser.getNeighborCount()+1)));
 				} else if (winnerDeterminationAlgo.equals("LOS02")) {
 					loser.setCriticalValue(temp * Math.sqrt(loser.getBundleCount()));						
 				} else {
@@ -337,6 +375,7 @@ public class CombinatorialAuction {
 		}	
 	}
 	
+	// incorrect one, left here, can use to compare with another one.
 	private int makeNewDecition2(int serialNumberOfCurrentBidder) {
 		Bidder currentBidder = bidders.get(serialNumberOfCurrentBidder);
 		for (int i = 0; i < totalBidders; i++) {
