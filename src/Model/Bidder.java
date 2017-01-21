@@ -11,6 +11,7 @@ public class Bidder {
 	private double priority;
 	private double payment;
 	private double criticalValue;
+	private double weightOfEdges;
 	
 	public Bidder(int ID, int totalBidders, int totalGoods){
 		this.ID = ID;
@@ -98,4 +99,14 @@ public class Bidder {
 	public void setNeighbors(int position,int isNeighbor) {
 		neighbors[position] = isNeighbor;
 	}
+
+	public double getWeightOfEdges() {
+		return weightOfEdges;
+	}
+
+	public void setWeightOfEdges(double weightOfEdges) {
+		this.weightOfEdges = weightOfEdges;
+	}
+	
+	
 }

@@ -6,13 +6,13 @@ import Problems.CombinatorialAuction;
 import java.io.IOException;
 
 public class Main {
-	private static final int TOTAL_PLAYER = 30;
-	private static final int TOTAL_GOODS = 300;
-	private static final int TOTAL_FILES = 1;
-	private static final int CHANCE = 5;
-	private static final int WEIGHT_BASE_OF_GOODS = 1000;
-	private static final int WEIGHT_RANGE_OF_GOODS = 500;
-	private static final int AMOUNT_RANGE_OF_EACH_GOOD = 1;
+	private static final int TOTAL_PLAYER = 10;
+	private static final int TOTAL_GOODS = 30;
+	private static final int TOTAL_FILES = 2000;
+	private static final int CHANCE = 15;
+	private static final int WEIGHT_BASE_OF_GOODS = 100;
+	private static final int WEIGHT_RANGE_OF_GOODS = 100;
+	private static final int AMOUNT_RANGE_OF_EACH_GOOD = 10;
 
 	public static void main(String[] args) throws IOException {
 		
@@ -86,11 +86,16 @@ public class Main {
 //					for(int j=0;j<TOTAL_GOODS;j++){
 //						if(bidders.get(i).getBundle()[j]>=1) System.out.print(j+"["+bidders.get(i).getBundle()[j]+"]"+",");
 //					}
-//					System.out.println(" /payment = "+(int)bidders.get(i).getPaymentByDegree()+"/");
+//					System.out.print("neighbor: ");
+//					for(int j=0;j<TOTAL_PLAYER;j++){
+//						if(bidders.get(i).getNeighbors()[j] == 1) System.out.print(j + ",");
+//					}
+//					System.out.print("weight: " + bidders.get(i).getWeight() + ",");
+//					System.out.println(" /payment = "+(int)bidders.get(i).getPayment()+"/");
 //				}
 //			}
 //			System.out.println();
-//			
+			
 			// total sell
 			for(int i=0;i<TOTAL_PLAYER;i++){
 				if(bidders.get(i).getChoice() == 1) sell_Of_Ours_Game += bidders.get(i).getBundleCount();
@@ -136,11 +141,17 @@ public class Main {
 //					for(int j=0;j<TOTAL_GOODS;j++){
 //						if(bidders.get(i).getBundle()[j]>=1) System.out.print(j+"["+bidders.get(i).getBundle()[j]+"]"+",");
 //					}
-//					System.out.println(" /payment = " + (int)bidders.get(i).getPaymentByGoods()+"/");
+//					System.out.print("neighbor: ");
+//					for(int j=0;j<TOTAL_PLAYER;j++){
+//						if(bidders.get(i).getNeighbors()[j] == 1) System.out.print(j + ",");
+//					}
+//					System.out.print("weight: " + bidders.get(i).getWeight() + ",");
+//					
+//					System.out.println(" /payment = " + (int)bidders.get(i).getPayment()+"/");
 //				}
 //			}
-//
-//			
+
+			
 			// print total sell
 			for(int i=0;i<TOTAL_PLAYER;i++){
 				if(bidders.get(i).getChoice() == 1) sell_Of_LOS02_Game += bidders.get(i).getBundleCount();
@@ -153,25 +164,25 @@ public class Main {
 		}
 
 		
-//		System.out.println("GAME SETTING : ");
-//		System.out.println("bidders = " + TOTAL_PLAYER);
-//		System.out.println("chance = " + CHANCE + "%");
-//		System.out.println("good species = " + TOTAL_GOODS);
-//		System.out.println("amount range of each good = " + AMOUNT_RANGE_OF_EACH_GOOD);
-//		System.out.println("total goods = " + good_amount / TOTAL_FILES);
-//		System.out.println("weight base of each good species = " + WEIGHT_BASE_OF_GOODS);
-//		System.out.println("weight range of each good species = " + WEIGHT_RANGE_OF_GOODS);
-//		System.out.println("density = " + (density_Of_Graph/TOTAL_FILES)*100 + "%");
-//		System.out.println();
-//		System.out.println("-----ours_game-----");
-//		System.out.println("benifit: " + Result_Of_Ours_Game / TOTAL_FILES);
-//		System.out.println("sell: " + sell_Of_Ours_Game / TOTAL_FILES);
-//		System.out.println("winner: " + winner_Of_Ours_Game / TOTAL_FILES);
-//		System.out.println("neighborCountOfWinners: " + neighborOfWinner_Ours / TOTAL_FILES);
-//		System.out.println("-----LOS02_game-----");
-//		System.out.println("benifit: " + Result_Of_LOS02_Game / TOTAL_FILES);
-//		System.out.println("sell: " + sell_Of_LOS02_Game / TOTAL_FILES);
-//		System.out.println("winner: " + winner_Of_LOS02_Game / TOTAL_FILES);
-//		System.out.println("neighborCountOfWinners: " + neighborOfWinner_LOS02 / TOTAL_FILES );
+		System.out.println("GAME SETTING : ");
+		System.out.println("bidders = " + TOTAL_PLAYER);
+		System.out.println("chance = " + CHANCE + "%");
+		System.out.println("good species = " + TOTAL_GOODS);
+		System.out.println("amount range of each good = " + AMOUNT_RANGE_OF_EACH_GOOD);
+		System.out.println("total goods = " + good_amount / TOTAL_FILES);
+		System.out.println("weight base of each good species = " + WEIGHT_BASE_OF_GOODS);
+		System.out.println("weight range of each good species = " + WEIGHT_RANGE_OF_GOODS);
+		System.out.println("density = " + (density_Of_Graph/TOTAL_FILES)*100 + "%");
+		System.out.println();
+		System.out.println("-----ours_game-----");
+		System.out.println("benifit: " + Result_Of_Ours_Game / TOTAL_FILES);
+		System.out.println("sell: " + sell_Of_Ours_Game / TOTAL_FILES);
+		System.out.println("winner: " + winner_Of_Ours_Game / TOTAL_FILES);
+		System.out.println("neighborCountOfWinners: " + neighborOfWinner_Ours / TOTAL_FILES);
+		System.out.println("-----LOS02_game-----");
+		System.out.println("benifit: " + Result_Of_LOS02_Game / TOTAL_FILES);
+		System.out.println("sell: " + sell_Of_LOS02_Game / TOTAL_FILES);
+		System.out.println("winner: " + winner_Of_LOS02_Game / TOTAL_FILES);
+		System.out.println("neighborCountOfWinners: " + neighborOfWinner_LOS02 / TOTAL_FILES );
 	}
 }
