@@ -6,13 +6,13 @@ import Problems.CombinatorialAuction;
 import java.io.IOException;
 
 public class Main {
-	private static final int TOTAL_PLAYER = 10;
-	private static final int TOTAL_GOODS = 30;
-	private static final int TOTAL_FILES = 2000;
-	private static final int CHANCE = 15;
-	private static final int WEIGHT_BASE_OF_GOODS = 100;
-	private static final int WEIGHT_RANGE_OF_GOODS = 100;
-	private static final int AMOUNT_RANGE_OF_EACH_GOOD = 10;
+	private static final int TOTAL_PLAYER = 10000;
+	private static final int TOTAL_GOODS = 4;
+	private static final int TOTAL_FILES = 1;
+	private static final int CHANCE = 25;
+	private static final int WEIGHT_BASE_OF_GOODS = 1;
+	private static final int WEIGHT_RANGE_OF_GOODS = 10;
+	private static final int AMOUNT_RANGE_OF_EACH_GOOD = 5000;
 
 	public static void main(String[] args) throws IOException {
 		
