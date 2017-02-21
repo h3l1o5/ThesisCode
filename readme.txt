@@ -2,10 +2,10 @@ current version:
 
 Combinatorial action game's winner determinate part is OK and payment algorithm is OK.
 Now we can decide the game is multi-unit or not.
+priority = bid / sqrt(|bundle|*(degree+1))
 
 update:
-rewrite ours winner determination algo
-now the priority = weight / bundleCount*(NeighborCount +1)
+delete fileUtil,Player class,FindMaximalIndependentSet class
 
 
 TODO:

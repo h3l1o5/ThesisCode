@@ -157,7 +157,7 @@ public class CombinatorialAuction {
 		}
 	}
 	
-	public void initBidderWeight(int base, int range) {
+	private void initBidderWeight(int base, int range) {
 		Random ran = new Random();
 		int bidderWeight;
 		int[] weightOfGood = new int[totalGoods];
@@ -180,7 +180,7 @@ public class CombinatorialAuction {
 		}
 	}
 
-	public void randomizeBidderID() {
+	private void randomizeBidderID() {
 		Random ran = new Random();
 		int target;
 		int temp;
