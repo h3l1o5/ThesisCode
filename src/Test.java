@@ -1,7 +1,7 @@
 import java.util.List;
 
 import Model.Bidder;
-import Problems.CombinatorialAuction;
+import Problem.CombinatorialAuction;
 
 public class Test {
 	private List<Bidder> bidders;

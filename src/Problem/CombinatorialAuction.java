@@ -1,4 +1,4 @@
-package Problems;
+package Problem;
 
 import java.awt.Label;
 import java.lang.reflect.Array;

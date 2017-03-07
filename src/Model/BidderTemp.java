@@ -5,17 +5,17 @@ import java.util.Map;
 import java.util.UUID;
 
 public class BidderTemp {
-	private UUID ID;
+	private int ID;
 	private boolean decision;
 	private double bid;
 	private double priority;
 	private double criticalValue;
 	private double payment;
-	private Map<UUID, Boolean> competitors;
+	private Map<Integer, Boolean> competitors;
 	private Map<Integer, Integer> bundle;
 	
-	public BidderTemp() {
-		ID = UUID.randomUUID();
+	public BidderTemp(int ID) {
+		this.ID = ID;
 		decision = false;
 		bid = 0;
 		priority = 0;
@@ -25,7 +25,7 @@ public class BidderTemp {
 		bundle = new HashMap<>();
 	}
 
-	public UUID getID() {
+	public int getID() {
 		return ID;
 	}
 
@@ -74,23 +74,27 @@ public class BidderTemp {
 	 * @return complete competitor list of this bidder
 	 * 
 	 */
-	public Map<UUID, Boolean> getAllCompetitor() {
+	public Map<Integer, Boolean> getAllCompetitor() {
 		return competitors;
 	}
 
 	/**
 	 * 
-	 * @param uuid id of some bidder
+	 * @param ID id of some bidder
 	 * @return whether this bidder is a competitor
 	 * 
 	 * */
-	public boolean getCompetitor(UUID uuid) {
-		return competitors.get(uuid);
+	public boolean getCompetitor(int ID) throws NullPointerException{
+		try {
+			return competitors.get(ID);
+		} catch (NullPointerException e) {
+			return false;
+		}
 	}
 	
 	public int getCompetitorCount() {
 		int count = 0;
-		for (Map.Entry<UUID, Boolean> entry : competitors.entrySet()) {
+		for (Map.Entry<Integer, Boolean> entry : competitors.entrySet()) {
 			if (entry.getValue() == true) {
 				count ++;
 			}
@@ -98,8 +102,8 @@ public class BidderTemp {
 		return count;
 	}
 	
-	public void setCompetitor(UUID uuid, boolean isCompetitor) {
-		competitors.put(uuid, isCompetitor);
+	public void setCompetitor(int ID, boolean isCompetitor) {
+		competitors.put(ID, isCompetitor);
 	}
 	
 	public Map<Integer, Integer> getWholeBundle() {
@@ -113,8 +117,12 @@ public class BidderTemp {
 	 * @return instance count of this type of good in bundle
 	 * 
 	 * */
-	public int getBundle(int goodType) {
-		return bundle.get(goodType);
+	public int getBundle(int goodType) throws NullPointerException{
+		try {
+			return bundle.get(goodType);
+		} catch(NullPointerException e) {
+			return 0;
+		}
 	}
 	
 	public int getBundleInstanceCount() {
@@ -123,6 +131,10 @@ public class BidderTemp {
 			count += entry.getValue();
 		}
 		return count;
+	}
+	
+	public void setBundle(int goodType, int amount) {
+		bundle.put(goodType, amount);
 	}
 }
 
