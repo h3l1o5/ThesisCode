@@ -1,31 +1,31 @@
 import java.util.List;
 
+import Environment.CombinatorialAuction;
 import Model.Bidder;
-import Problem.CombinatorialAuction;
 
 import java.io.IOException;
 
 public class Main {
-	private static final int TOTAL_PLAYER = 10;
-	private static final int TOTAL_GOODS = 500;
-	private static final int TOTAL_FILES = 1000;
+	private static final int TOTAL_PLAYER = 5;
+	private static final int TOTAL_GOODS = 100;
+	private static final int TOTAL_FILES = 10000;
 	private static final int CHANCE = 5;
 	private static final int WEIGHT_BASE_OF_GOODS = 10;
-	private static final int WEIGHT_RANGE_OF_GOODS = 10;
+	private static final int WEIGHT_RANGE_OF_GOODS = 20;
 	private static final int AMOUNT_RANGE_OF_EACH_GOOD = 10;
 
 	public static void main(String[] args) throws IOException {
 		
 		// test
-		Test test = new Test();
-		test.startSingleUnitTest();
-		System.out.println("-----------------------------------------------------------------------------");
-		test.startMultiUnitTest();
-		System.out.println("-----------------------------------------------------------------------------");
+//		Test test = new Test();
+//		test.startSingleUnitTest();
+//		System.out.println("-----------------------------------------------------------------------------");
+//		test.startMultiUnitTest();
+//		System.out.println("-----------------------------------------------------------------------------");
 
 
-		int Result_Of_Ours_Game = 0;
-		int Result_Of_LOS02_Game = 0;
+		double Result_Of_Ours_Game = 0;
+		double Result_Of_LOS02_Game = 0;
 		double sell_Of_Ours_Game = 0;
 		double sell_Of_LOS02_Game = 0;
 		double winner_Of_Ours_Game = 0;
@@ -34,7 +34,10 @@ public class Main {
 		double neighborOfWinner_Ours = 0;
 		double neighborOfWinner_LOS02 = 0;
 		double density_Of_Graph = 0;
+		
+		long s = System.currentTimeMillis();
 		for (int file = 1; file <= TOTAL_FILES; file++) {
+	
 			double totalPaymentDegree;
 			double totalPaymentGoods;
 			int neighborCount;
@@ -77,24 +80,6 @@ public class Main {
 			}
 			neighborOfWinner_Ours += neighborCount / winner;
 			
-			// print winner
-//			System.out.print("winner/ours");
-//			System.out.println();		
-//			for(int i=0;i<TOTAL_PLAYER;i++) {
-//				if(bidders.get(i).getChoice()==1){
-//					System.out.print("bidder"+i+": ");
-//					for(int j=0;j<TOTAL_GOODS;j++){
-//						if(bidders.get(i).getBundle()[j]>=1) System.out.print(j+"["+bidders.get(i).getBundle()[j]+"]"+",");
-//					}
-//					System.out.print("neighbor: ");
-//					for(int j=0;j<TOTAL_PLAYER;j++){
-//						if(bidders.get(i).getNeighbors()[j] == 1) System.out.print(j + ",");
-//					}
-//					System.out.print("weight: " + bidders.get(i).getWeight() + ",");
-//					System.out.println(" /payment = "+(int)bidders.get(i).getPayment()+"/");
-//				}
-//			}
-//			System.out.println();
 			
 			// total sell
 			for(int i=0;i<TOTAL_PLAYER;i++){
@@ -132,26 +117,6 @@ public class Main {
 			}
 			neighborOfWinner_LOS02 += neighborCount / winner;
 			
-			// print winner
-//			System.out.print("winner/LOS02");
-//			System.out.println();		
-//			for(int i=0;i<TOTAL_PLAYER;i++) {
-//				if(bidders.get(i).getChoice()==1){
-//					System.out.print("bidder"+i+": ");
-//					for(int j=0;j<TOTAL_GOODS;j++){
-//						if(bidders.get(i).getBundle()[j]>=1) System.out.print(j+"["+bidders.get(i).getBundle()[j]+"]"+",");
-//					}
-//					System.out.print("neighbor: ");
-//					for(int j=0;j<TOTAL_PLAYER;j++){
-//						if(bidders.get(i).getNeighbors()[j] == 1) System.out.print(j + ",");
-//					}
-//					System.out.print("weight: " + bidders.get(i).getWeight() + ",");
-//					
-//					System.out.println(" /payment = " + (int)bidders.get(i).getPayment()+"/");
-//				}
-//			}
-
-			
 			// print total sell
 			for(int i=0;i<TOTAL_PLAYER;i++){
 				if(bidders.get(i).getChoice() == 1) sell_Of_LOS02_Game += bidders.get(i).getBundleCount();
@@ -161,7 +126,10 @@ public class Main {
 			for(int i=0;i<TOTAL_PLAYER; i++){
 				if(bidders.get(i).getChoice() == 1) winner_Of_LOS02_Game += 1;
 			}
+			System.out.println("iteration: " + file + "...");
 		}
+		long e = System.currentTimeMillis();
+		System.out.println("time: " + (e-s));
 
 		
 		System.out.println("GAME SETTING : ");

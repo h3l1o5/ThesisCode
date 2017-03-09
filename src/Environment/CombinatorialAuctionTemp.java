@@ -1,4 +1,4 @@
-package Problem;
+package Environment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,31 +31,27 @@ public class CombinatorialAuctionTemp {
 		letBidderKnowTheirCompetitors();
 	}
 	
-	public void start(String processMethod, String winnerDeterminationAlgo) {
-		for (Good good : wareHouse) {
-			good.resetLeft();
-		}		
-		for (BidderTemp bidder : bidders) {
-			bidder.setDecision(false);
-		}
-		
-		switch (processMethod) {
-		case "game":
-			processInGameMethod();
-			break;
-		case "centralize":
-			processInCentralizeMethod();
-			break;
-		default:
-			System.out.println("Error: no such process method");
-			System.exit(2);
-		}
+	/*getters and setters*/
+	public int getAmountOfBidder() {
+		return amountOfBidder;
+	}
+
+	public int getAmountOfGoodType() {
+		return amountOfGoodType;
+	}
+
+	public List<Good> getWareHouse() {
+		return wareHouse;
 	}
 	
 	public List<BidderTemp> getBidders() {
 		return bidders;
 	}
 
+	public void setBidders(List<BidderTemp> bidders) {
+		this.bidders = bidders;
+	}
+	
 	/*initializers*/
 	private void createBidder() {
 		for (int i=0;i<amountOfBidder;i++) {
@@ -112,10 +108,12 @@ public class CombinatorialAuctionTemp {
 	private void letBidderKnowTheirCompetitors() {
 		for (int i=0; i<amountOfBidder; i++) {
 			BidderTemp bidder = bidders.get(i);
+			Map<Integer, Integer> bundle = bidder.getWholeBundle();
 			for (int j=i+1; j<amountOfBidder; j++) {
 				BidderTemp anotherBidder = bidders.get(j);
+				Map<Integer, Integer> anotherBundle = anotherBidder.getWholeBundle();
 				for (int k=0; k<amountOfGoodType; k++) {
-					if (bidder.getBundle(k)>0 && anotherBidder.getBundle(k)>0) {
+					if (bundle.containsKey(k) == true && anotherBundle.containsKey(k) == true) {
 						bidder.setCompetitor(anotherBidder.getID(), true);
 						anotherBidder.setCompetitor(bidder.getID(), true);
 						break;
@@ -124,18 +122,4 @@ public class CombinatorialAuctionTemp {
 			}
 		}
 	}
-	
-	/*process methods*/
-	private void processInGameMethod() {
-		
-	}
-	
-	private void processInCentralizeMethod() {
-		
-	}
-	
-	/*calculators*/
-	
-	
-	/*checkers*/
 }

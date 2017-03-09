@@ -1,4 +1,4 @@
-package Problem;
+package Environment;
 
 import java.awt.Label;
 import java.lang.reflect.Array;
@@ -29,7 +29,7 @@ public class CombinatorialAuction {
 	public CombinatorialAuction(int size, int totalGoods, int weightBaseOfGoods, int weightRangeOfGoods, int chance, int amountRangeOfEachGood) {
 		this.totalBidders = size;
 		this.totalGoods = totalGoods;
-		this.chance = 100/chance;
+		this.chance = chance;
 		this.amountRangeOfEachGood = amountRangeOfEachGood;
 		goodStore = new int[totalGoods];
 		goodStoreOriginal = new int[totalGoods];
@@ -132,7 +132,7 @@ public class CombinatorialAuction {
 		for (int i = 0; i < totalBidders; i++) {
 			Bidder bidder = bidders.get(i);
 			for (int j = 0; j < totalGoods; j++) {
-				if (ran.nextInt(chance) % chance == 0) {
+				if (ran.nextInt(1000) < chance*10) {
 					int amountToTake = ran.nextInt(goodStore[j])+1;
 					bidder.setBundle(j, amountToTake);
 				}
@@ -160,9 +160,9 @@ public class CombinatorialAuction {
 	private void initBidderWeight(int base, int range) {
 		Random ran = new Random();
 		int bidderWeight;
-		int[] weightOfGood = new int[totalGoods];
+		double[] weightOfGood = new double[totalGoods];
 		for (int i = 0; i < totalGoods; i++) {
-			weightOfGood[i] = ran.nextInt(range) + base;
+			weightOfGood[i] = (ran.nextDouble()*10 + 10);
 		}
 		for (int i = 0; i < totalBidders; i++) {
 			Bidder bidder = bidders.get(i);
@@ -173,7 +173,7 @@ public class CombinatorialAuction {
 					while (normalRandomNumber <= 0) {
 						normalRandomNumber = ran.nextGaussian() * (weightOfGood[j] / 5) + weightOfGood[j];
 					}
-					bidderWeight += (normalRandomNumber*bidder.getBundle()[j]);
+					bidderWeight += (normalRandomNumber*bidder.getBundle()[j])*(1+ (bidder.getBundle()[j]-1)*0.02);
 				}
 			}
 			bidder.setWeight(bidderWeight);
@@ -196,10 +196,11 @@ public class CombinatorialAuction {
 	private void Game_async(String winnerDeterminationAlgo) {
 		int flag;
 		int newDecision;
+		int step;
 
 		calculatePriority(winnerDeterminationAlgo);
 		
-		for (int step = 1;; step++) {
+		for (step = 1;; step++) {
 			flag = 0;
 			for (int i = 0; i < totalBidders; i++) {
 				Bidder bidder = bidders.get(i);
