@@ -12,6 +12,7 @@ public class Good {
 		Random ran = new Random();
 		this.type = type;
 		valuation = ran.nextDouble()*10 + 10;
+		
 		switch (rangeOfInstanceCount) {
 		case 0:
 			System.out.println("Error: range of instance count must greater than 0");
@@ -23,6 +24,7 @@ public class Good {
 			instanceCount = ran.nextInt(rangeOfInstanceCount) + 1;
 			break;
 		}
+		
 		resetLeft();
 	}
 

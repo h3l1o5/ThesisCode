@@ -3,26 +3,24 @@ package ProcessMethod;
 import java.util.List;
 import java.util.Map;
 
-import Environment.CombinatorialAuctionTemp;
-import Model.BidderTemp;
+import Environment.CombinatorialAuction;
+import Model.Bidder;
 import Model.Good;
 import Utils.Calculator;
 
 public class Game {
-	CombinatorialAuctionTemp auction;
-	private List<BidderTemp> bidders;
+	private List<Bidder> bidders;
 	private List<Good> wareHouse;
 	
-	public Game(CombinatorialAuctionTemp auction) {
-		this.auction = auction;
+	public Game(CombinatorialAuction auction) {
 		bidders = auction.getBidders();
 		wareHouse = auction.getWareHouse();
 	}
 
-	public void start(String winnerDeterminationAlgo) {
+	public boolean start(String winnerDeterminationAlgo) {
 	
 		/*reset data*/
-		for (BidderTemp bidder : bidders) {
+		for (Bidder bidder : bidders) {
 			bidder.setDecision(false);
 			bidder.setPriority(Calculator.calculatePriority(bidder,winnerDeterminationAlgo));
 		}
@@ -30,12 +28,16 @@ public class Game {
 			good.resetLeft();
 		}
 		
+		/*run auction*/
 		boolean newDecision;
 		boolean done = false;
-
+		int step = 0;
 		while(!done) {
+			if (step > 10000) {
+				return false; // time out.
+			}
 			done = true;
-			for (BidderTemp bidder : bidders) {
+			for (Bidder bidder : bidders) {
 				Map<Integer, Integer> bundle = bidder.getWholeBundle();
 				newDecision = Calculator.makeNewDecision(bidder, bidders, wareHouse);
 				if (bidder.getDecision() != newDecision) {
@@ -53,9 +55,11 @@ public class Game {
 					break;
 				}
 			}
+			step ++ ;
 		}
 		
-		for (BidderTemp bidder : bidders) {
+		/*auction finished. calculate each bidder's CV&payment*/
+		for (Bidder bidder : bidders) {
 			double criticalValue = Calculator.calculateCriticalValue(bidder, bidders, wareHouse, winnerDeterminationAlgo);
 			bidder.setCriticalValue(criticalValue);
 			
@@ -66,6 +70,6 @@ public class Game {
 			}
 		}
 		
-		auction.setBidders(bidders);
+		return true;
 	}
 }

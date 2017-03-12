@@ -1,47 +1,48 @@
 package Model;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class Bidder {
 	private int ID;
-	private int choice;
-	private int[] neighbors;
-	private int[] bundle;
-	private int totalGoods;
-	private int totalBidders;
-	private double weight;
+	private boolean decision;
+	private double bid;
 	private double priority;
-	private double payment;
 	private double criticalValue;
+	private double payment;
+	private Map<Integer, Boolean> competitors;
+	private Map<Integer, Integer> bundle;
 	
-	public Bidder(int ID, int totalBidders, int totalGoods){
+	public Bidder(int ID) {
 		this.ID = ID;
-		this.totalGoods = totalGoods;
-		this.totalBidders = totalBidders;
-		bundle = new int[totalGoods];
-		neighbors = new int[totalBidders];
+		decision = false;
+		bid = 0;
+		priority = 0;
+		criticalValue = 0;
+		payment = 0;
+		competitors = new HashMap<>();
+		bundle = new HashMap<>();
 	}
-	
+
 	public int getID() {
 		return ID;
 	}
 
-	public void setID(int iD) {
-		ID = iD;
+	public boolean getDecision() {
+		return decision;
 	}
 
-	public int getChoice() {
-		return choice;
+	public void setDecision(boolean decision) {
+		this.decision = decision;
 	}
 
-	public void setChoice(int choice) {
-		this.choice = choice;
-	}
-	
-	public double getWeight() {
-		return weight;
+	public double getBid() {
+		return bid;
 	}
 
-	public void setWeight(double weight) {
-		this.weight = weight;
+	public void setBid(double bid) {
+		this.bid = bid;
 	}
 
 	public double getPriority() {
@@ -52,51 +53,89 @@ public class Bidder {
 		this.priority = priority;
 	}
 
-	public double getPayment() {
-		return payment;
-	}
-
-	public void setPayment(double payment) {
-		this.payment = payment;
-	}
-
 	public double getCriticalValue() {
 		return criticalValue;
 	}
+
 	public void setCriticalValue(double criticalValue) {
 		this.criticalValue = criticalValue;
 	}
+	
+	public double getPayment() {
+		return payment;
+	}
+	
+	public void setPayment(double payment) {
+		this.payment = payment;
+	}
+	
+	/**
+	 * 
+	 * @return complete competitor list of this bidder
+	 * 
+	 */
+	public Map<Integer, Boolean> getAllCompetitor() {
+		return competitors;
+	}
 
-	public int getBundleCount() {
-		int count=0;
-		for(int i=0;i<totalGoods;i++){
-			if(bundle[i]>=1) count += bundle[i];
+	/**
+	 * 
+	 * @param ID id of some bidder
+	 * @return whether this bidder is a competitor
+	 * 
+	 * */
+	public boolean getCompetitor(int ID) throws NullPointerException{
+		try {
+			return competitors.get(ID);
+		} catch (NullPointerException e) {
+			return false;
+		}
+	}
+	
+	public int getCompetitorCount() {
+		int count = 0;
+		for (Map.Entry<Integer, Boolean> entry : competitors.entrySet()) {
+			if (entry.getValue() == true) {
+				count ++;
+			}
 		}
 		return count;
 	}
-
-	public int[] getBundle() {
+	
+	public void setCompetitor(int ID, boolean isCompetitor) {
+		competitors.put(ID, isCompetitor);
+	}
+	
+	public Map<Integer, Integer> getWholeBundle() {
 		return bundle;
 	}
-
-	public void setBundle(int position, int choose) {
-		bundle[position] = choose;
+	
+	
+	/**
+	 * 
+	 * @param goodType type of good
+	 * @return instance count of this type of good in bundle
+	 * 
+	 * */
+	public int getBundle(int goodType) throws NullPointerException{
+		try {
+			return bundle.get(goodType);
+		} catch(NullPointerException e) {
+			return 0;
+		}
 	}
 	
-	public int getNeighborCount() {
-		int count=0;
-		for(int i=0;i<totalBidders;i++){
-			if(neighbors[i]==1) count++;
+	public int getBundleInstanceCount() {
+		int count = 0;
+		for (Map.Entry<Integer, Integer> entry : bundle.entrySet()) {
+			count += entry.getValue();
 		}
 		return count;
 	}
 	
-	public int[] getNeighbors() {
-		return neighbors;
+	public void setBundle(int goodType, int amount) {
+		bundle.put(goodType, amount);
 	}
-
-	public void setNeighbors(int position,int isNeighbor) {
-		neighbors[position] = isNeighbor;
-	}
-	
 }
+
+

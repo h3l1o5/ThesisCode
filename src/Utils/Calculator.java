@@ -3,12 +3,12 @@ package Utils;
 import java.util.List;
 import java.util.Map;
 
-import Model.BidderTemp;
+import Model.Bidder;
 import Model.Good;
 
 public class Calculator {
 	
-	public static boolean makeNewDecision(BidderTemp currentBidder, List<BidderTemp> bidders, List<Good> wareHouse) {
+	public static boolean makeNewDecision(Bidder currentBidder, List<Bidder> bidders, List<Good> wareHouse) {
 		Map<Integer,Integer> bundle = currentBidder.getWholeBundle();
 		Map<Integer, Boolean> competitors = currentBidder.getAllCompetitor();
 		for (Map.Entry<Integer, Integer> goodEntry : bundle.entrySet()) {
@@ -17,7 +17,7 @@ public class Calculator {
 			
 			for (Map.Entry<Integer, Boolean> competitorEntry : competitors.entrySet()) {
 				if (bidders.get(competitorEntry.getKey()).getDecision() == true) {
-					BidderTemp competitor = bidders.get(competitorEntry.getKey());
+					Bidder competitor = bidders.get(competitorEntry.getKey());
 					if (competitor.getPriority() > currentBidder.getPriority()) {
 						totalNeededOfThisGood += competitor.getBundle(goodEntry.getKey());
 					}
@@ -32,7 +32,7 @@ public class Calculator {
 	}
 	
 	
-	public static double calculatePriority(BidderTemp bidder, String winnerDeterminationAlgo) {
+	public static double calculatePriority(Bidder bidder, String winnerDeterminationAlgo) {
 		double result = 0;
 		switch (winnerDeterminationAlgo) {
 		case "LOS02":
@@ -49,7 +49,7 @@ public class Calculator {
 	}
 	
 	
-	public static double calculateCriticalValue(BidderTemp bidder, List<BidderTemp> bidders,List<Good> wareHouse, String winnerDeterminationAlgo) {
+	public static double calculateCriticalValue(Bidder bidder, List<Bidder> bidders,List<Good> wareHouse, String winnerDeterminationAlgo) {
 		Map<Integer, Boolean> competitors = bidder.getAllCompetitor();
 		double temp;
 		if (bidder.getDecision() == true) {
@@ -59,7 +59,7 @@ public class Calculator {
 			// find all competitors who will become winner if this winner was not win.
 			bidder.setDecision(false);
 			for (Map.Entry<Integer, Boolean> entry : competitors.entrySet()) {
-				BidderTemp targetBidder = bidders.get(entry.getKey());
+				Bidder targetBidder = bidders.get(entry.getKey());
 				if (targetBidder.getDecision() == false){
 					if (makeNewDecision(targetBidder, bidders, wareHouse) == true && targetBidder.getPriority() > temp) {
 						temp = targetBidder.getPriority();
@@ -76,7 +76,7 @@ public class Calculator {
 			
 			// find all winner competitors that while he lose, I win.  
 			for (Map.Entry<Integer, Boolean> entry : competitors.entrySet()) {
-				BidderTemp targetBidder = bidders.get(entry.getKey());
+				Bidder targetBidder = bidders.get(entry.getKey());
 				if (targetBidder.getDecision() == true) {
 					targetBidder.setDecision(false);
 					if(makeNewDecision(bidder, bidders, wareHouse) == true && targetBidder.getPriority() < temp) {
