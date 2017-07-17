@@ -9,9 +9,10 @@ public class Bidder {
 	private boolean decision;
 	private double bid;
 	private double priority;
+	private int totalConflictGood;
 	private double criticalValue;
 	private double payment;
-	private Map<Integer, Boolean> competitors;
+	private Map<Bidder, Integer> competitors;
 	private Map<Integer, Integer> bundle;
 	
 	public Bidder(int ID) {
@@ -19,10 +20,16 @@ public class Bidder {
 		decision = false;
 		bid = 0;
 		priority = 0;
+		totalConflictGood = 0;
 		criticalValue = 0;
 		payment = 0;
 		competitors = new HashMap<>();
 		bundle = new HashMap<>();
+	}
+	
+	@Override
+	public String toString() {
+		return Integer.toString(ID);
 	}
 
 	public int getID() {
@@ -74,7 +81,7 @@ public class Bidder {
 	 * @return complete competitor list of this bidder
 	 * 
 	 */
-	public Map<Integer, Boolean> getAllCompetitor() {
+	public Map<Bidder, Integer> getAllCompetitor() {
 		return competitors;
 	}
 
@@ -84,26 +91,26 @@ public class Bidder {
 	 * @return whether this bidder is a competitor
 	 * 
 	 * */
-	public boolean getCompetitor(int ID) throws NullPointerException{
+	public int getCompetitor(int ID) throws NullPointerException{
 		try {
 			return competitors.get(ID);
 		} catch (NullPointerException e) {
-			return false;
+			return 0;
 		}
 	}
 	
 	public int getCompetitorCount() {
 		int count = 0;
-		for (Map.Entry<Integer, Boolean> entry : competitors.entrySet()) {
-			if (entry.getValue() == true) {
+		for (Map.Entry<Bidder, Integer> entry : competitors.entrySet()) {
+			if (entry.getValue() > 0) {
 				count ++;
 			}
 		}
 		return count;
 	}
 	
-	public void setCompetitor(int ID, boolean isCompetitor) {
-		competitors.put(ID, isCompetitor);
+	public void setCompetitor(Bidder bidder, int numberOfConflict) {
+		competitors.put(bidder, numberOfConflict);
 	}
 	
 	public Map<Integer, Integer> getWholeBundle() {
@@ -135,6 +142,14 @@ public class Bidder {
 	
 	public void setBundle(int goodType, int amount) {
 		bundle.put(goodType, amount);
+	}
+	
+	public int getTotalConflictGood() {
+		return totalConflictGood;
+	}
+	
+	public void setTotalConflictGood(int totalConflictGood) {
+		this.totalConflictGood = totalConflictGood;
 	}
 }
 

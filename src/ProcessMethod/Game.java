@@ -1,5 +1,6 @@
 package ProcessMethod;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -17,25 +18,25 @@ public class Game {
 		wareHouse = auction.getWareHouse();
 	}
 
-	public boolean start(String winnerDeterminationAlgo) {
+	public int start(String PD) {
 	
 		/*reset data*/
 		for (Bidder bidder : bidders) {
 			bidder.setDecision(false);
-			bidder.setPriority(Calculator.calculatePriority(bidder,winnerDeterminationAlgo));
+			bidder.setPriority(Calculator.calculatePriority(bidder,PD));
 		}
 		for (Good good : wareHouse) {
 			good.resetLeft();
 		}
 		
+		/*random ordered bidder list*/
+		Collections.shuffle(bidders);
+
 		/*run auction*/
 		boolean newDecision;
 		boolean done = false;
-		int step = 0;
-		while(!done) {
-			if (step > 10000) {
-				return false; // time out.
-			}
+		int rounds = 0;
+		while(!done) {	
 			done = true;
 			for (Bidder bidder : bidders) {
 				Map<Integer, Integer> bundle = bidder.getWholeBundle();
@@ -52,15 +53,16 @@ public class Game {
 					}					
 					bidder.setDecision(newDecision);
 					done = false;
-					break;
 				}
 			}
-			step ++ ;
+			rounds ++;
 		}
+		
+		Calculator.checkWarehouse(wareHouse);
 		
 		/*auction finished. calculate each bidder's CV&payment*/
 		for (Bidder bidder : bidders) {
-			double criticalValue = Calculator.calculateCriticalValue(bidder, bidders, wareHouse, winnerDeterminationAlgo);
+			double criticalValue = Calculator.calculateCriticalValue(bidder, bidders, wareHouse, PD);
 			bidder.setCriticalValue(criticalValue);
 			
 			if (bidder.getDecision() == true) {
@@ -70,6 +72,6 @@ public class Game {
 			}
 		}
 		
-		return true;
+		return rounds;
 	}
 }

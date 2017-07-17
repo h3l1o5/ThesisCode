@@ -10,34 +10,34 @@ import Model.Good;
 public class CombinatorialAuction {
 	Random ran = new Random();
 	
-	private int amountOfBidder;
-	private int amountOfGoodType;
-	private double chance; // chance of whether a bidder want a good.
-	private int instanceRangeOfGood;
+	private int numberOfBidders;
+	private int numberOfGoodTypes;
+	private int probability; // chance of whether a bidder desire a good.
+	private int maxAvailableUnit;
 	private List<Good> wareHouse;
 	private List<Bidder> bidders;
 	
-	public CombinatorialAuction(int amountOfBidder, int amountOfGoodType, double chance, int instanceRangeOfGood) {
-		this.amountOfBidder = amountOfBidder;
-		this.amountOfGoodType = amountOfGoodType;
-		this.chance = chance;
-		this.instanceRangeOfGood = instanceRangeOfGood;
+	public CombinatorialAuction(int m, int n, int p, int lambda, boolean SA) {
+		this.numberOfBidders = m;
+		this.numberOfGoodTypes = n;
+		this.probability = p;
+		this.maxAvailableUnit = lambda;
 		wareHouse = new ArrayList<>();
 		bidders = new ArrayList<>();
 		createBidder();
 		createGood();
 		letBidderChooseGood();
-		letBidderDecideTheirBid();
+		letBidderDecideTheirBid(SA);
 		letBidderKnowTheirCompetitors();
 	}
 	
 	/*getters and setters*/
 	public int getAmountOfBidder() {
-		return amountOfBidder;
+		return numberOfBidders;
 	}
 
 	public int getAmountOfGoodType() {
-		return amountOfGoodType;
+		return numberOfGoodTypes;
 	}
 
 	public List<Good> getWareHouse() {
@@ -53,12 +53,12 @@ public class CombinatorialAuction {
 	}
 	
 	public double getCompetitiveIntensity() {
-		int fullCompetition = amountOfBidder*(amountOfBidder-1)/2;
+		int fullCompetition = numberOfBidders*(numberOfBidders-1)/2;
 		int realCompetition = 0;
 		for (Bidder bidder : bidders) {
-			Map<Integer, Boolean> competitors = bidder.getAllCompetitor();
-			for (Map.Entry<Integer, Boolean> entry : competitors.entrySet()) {
-				if (entry.getValue() == true) {
+			Map<Bidder, Integer> competitors = bidder.getAllCompetitor();
+			for (Map.Entry<Bidder, Integer> entry : competitors.entrySet()) {
+				if (entry.getValue() > 0) {
 					realCompetition ++ ;
 				}
 			}
@@ -70,15 +70,15 @@ public class CombinatorialAuction {
 	
 	/*initializers*/
 	private void createBidder() {
-		for (int i=0;i<amountOfBidder;i++) {
+		for (int i=0;i<numberOfBidders;i++) {
 			Bidder bidder = new Bidder(i);
 			bidders.add(bidder);
 		}
 	}
 	
 	private void createGood() {
-		for (int i=0;i<amountOfGoodType;i++) {
-			Good good = new Good(i, instanceRangeOfGood);
+		for (int i=0;i<numberOfGoodTypes;i++) {
+			Good good = new Good(i, maxAvailableUnit);
 			wareHouse.add(good);
 		}
 	}
@@ -88,9 +88,11 @@ public class CombinatorialAuction {
 			boolean emptyBundle = true;
 			while (emptyBundle) {
 				for (Good good : wareHouse) {
-					if (ran.nextInt(1000) < chance*10) { // want this one
+					if (ran.nextInt(1000) < probability*10) { // want this one
 						int instanceToTake = ran.nextInt(good.getInstanceCount())+1;
 						bidder.setBundle(good.getType(), instanceToTake);
+					} else {
+						bidder.setBundle(good.getType(), 0);
 					}
 				}
 				if (bidder.getBundleInstanceCount() != 0) {
@@ -100,46 +102,54 @@ public class CombinatorialAuction {
 		}
 	}
 	
-	private void letBidderDecideTheirBid() {
+	private void letBidderDecideTheirBid(boolean SA) {
 		for (Bidder bidder : bidders) {
-			double bid = 0;
-			Map<Integer, Integer> bundle = bidder.getWholeBundle();
-			for (Map.Entry<Integer, Integer> entry : bundle.entrySet()) {
-				if (entry.getValue() > 0) {
-					double valuationOriginal = wareHouse.get(entry.getKey()).getValuation();					
-					double valuationBidder = valuationOriginal;
+			double bid;
+			
+			if (SA) {
+				bid = 0;
+				Map<Integer, Integer> bundle = bidder.getWholeBundle();
+				for (Map.Entry<Integer, Integer> entry : bundle.entrySet()) {
+					if (entry.getValue() > 0) {
+						double valuationOriginal = wareHouse.get(entry.getKey()).getValuation();					
+						double valuationBidder = valuationOriginal;
 
-					// every bidder has his own valuation of each type of good
-					// but the difference won't be too huge 
-					// so we model it as a normal distribution
-					// mean=original valuation, standard deviation=(original valuation)/5
-					do {
-						valuationBidder = ran.nextGaussian() * (valuationOriginal / 5) + valuationOriginal;
-					} while (valuationBidder <= 0); // drop 0 or negative value
+						// every bidder has his own valuation of each type of good
+						// but the difference won't be too huge 
+						// so we model it as a normal distribution
+						// mean=original valuation, standard deviation=(original valuation)/5
+						do {
+							valuationBidder = ran.nextGaussian() * (valuationOriginal / 5) + valuationOriginal;
+						} while (valuationBidder <= 0); // drop 0 or negative value
 					
-					valuationBidder = valuationBidder*entry.getValue()*(1 + (entry.getValue()-1)*0.02); // want more, bid more.
-					
-					bid += valuationBidder;
+						valuationBidder = valuationBidder*entry.getValue(); 
+						bid += valuationBidder;
+					}
 				}
+			} else {
+				bid = ran.nextDouble()*300+200;
 			}
+			
 			bidder.setBid(bid);
 		}
 	}
 	
 	private void letBidderKnowTheirCompetitors() {
-		for (int i=0; i<amountOfBidder; i++) {
+		for (int i=0; i<numberOfBidders; i++) {
 			Bidder bidder = bidders.get(i);
 			Map<Integer, Integer> bundle = bidder.getWholeBundle();
-			for (int j=i+1; j<amountOfBidder; j++) {
+			
+			for (int j=i+1; j<numberOfBidders; j++) {		
 				Bidder anotherBidder = bidders.get(j);
 				Map<Integer, Integer> anotherBundle = anotherBidder.getWholeBundle();
-				for (int k=0; k<amountOfGoodType; k++) {
-					if (bundle.containsKey(k) == true && anotherBundle.containsKey(k) == true) {
-						bidder.setCompetitor(anotherBidder.getID(), true);
-						anotherBidder.setCompetitor(bidder.getID(), true);
-						break;
-					}
+				int numberOfConflict = 0;
+				
+				for (int k=0; k<numberOfGoodTypes; k++) {
+					numberOfConflict += bundle.get(k)*anotherBundle.get(k);
 				}
+				
+				bidder.setCompetitor(anotherBidder, numberOfConflict);
+				anotherBidder.setCompetitor(bidder, numberOfConflict);
 			}
 		}
 	}
