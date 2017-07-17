@@ -15,7 +15,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		int timeOutCount = 0;
-		double competitiveIntensity = 0;
+		double competitionIntensity = 0;
 		double revenue_ours = 0;
 		double revenue_LOS02 = 0;
 		int winner_ours = 0;
@@ -29,7 +29,7 @@ public class Main {
 			System.out.print("iteration " + i + "... ");
 			CombinatorialAuction auction = new CombinatorialAuction(TOTAL_BIDDER, TOTAL_GOOD, CHANCE, AMOUNT_OF_GOOD);
 			Game game = new Game(auction);
-			competitiveIntensity += auction.getCompetitiveIntensity();
+			competitionIntensity += auction.getCompetitiveIntensity();
 						
 			if (game.start("ours")) {
 				bidders = auction.getBidders();	
@@ -67,7 +67,7 @@ public class Main {
 		System.out.println();
 		System.out.println();
 		System.out.println("Total running time: " + (e - s)/1000 + "s");		
-		System.out.println("Average competitive intensity: " + competitiveIntensity / (TOTAL_ITERATION-timeOutCount) + "%");
+		System.out.println("Average competitive intensity: " + competitionIntensity / (TOTAL_ITERATION-timeOutCount) + "%");
 		System.out.println("-----ours-----");
 		System.out.println("Revenue: " + revenue_ours / (TOTAL_ITERATION-timeOutCount));
 		System.out.println("Sell: " + (double)sell_ours / (TOTAL_ITERATION-timeOutCount));
