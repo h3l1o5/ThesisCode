@@ -49,14 +49,19 @@ public class Calculator {
 		case "ABPC":
 			result = bidder.getBid() / Math.sqrt(bidder.getCompetitorCount()+1);
 			break;
-		case "ABPCG":
+		case "AFBPUG":
 			int totalConflictGood = 0;
+			double totalCompetitorsBid = 0;
 			Map<Bidder, Integer> competitors = bidder.getAllCompetitor();
 			for (Map.Entry<Bidder, Integer> entry : competitors.entrySet()) {
-				totalConflictGood += entry.getValue();
+				if (entry.getValue() > 0) {
+					totalConflictGood += entry.getValue();
+					totalCompetitorsBid += entry.getKey().getBid();
+				}
 			}
 			bidder.setTotalConflictGood(totalConflictGood);
-			result = bidder.getBid() / Math.sqrt(totalConflictGood+1);
+			bidder.setTotalCompetitorsBid(totalCompetitorsBid);
+			result = bidder.getBid() / Math.sqrt(totalConflictGood*totalCompetitorsBid+1);
 			break;
 		default:
 			System.err.println("Error: no such winner determination algo");
@@ -114,8 +119,10 @@ public class Calculator {
 		case "ABPC":
 			temp = temp * Math.sqrt(bidder.getCompetitorCount()+1);
 			break;
-		case "ABPCG":
-			temp = temp * Math.sqrt(bidder.getTotalConflictGood()+1);
+
+		case "AFBPUG":
+			temp = temp * Math.sqrt(bidder.getTotalConflictGood()*bidder.getTotalCompetitorsBid()+1);
+
 			break;
 		default:
 			System.err.println("Error: no such winner determination algo");

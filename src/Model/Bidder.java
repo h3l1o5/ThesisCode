@@ -10,6 +10,7 @@ public class Bidder {
 	private double bid;
 	private double priority;
 	private int totalConflictGood;
+	private double totalCompetitorsBid;
 	private double criticalValue;
 	private double payment;
 	private Map<Bidder, Integer> competitors;
@@ -150,6 +151,14 @@ public class Bidder {
 	
 	public void setTotalConflictGood(int totalConflictGood) {
 		this.totalConflictGood = totalConflictGood;
+	}
+
+	public double getTotalCompetitorsBid() {
+		return totalCompetitorsBid;
+	}
+
+	public void setTotalCompetitorsBid(double totalCompetitorsBid) {
+		this.totalCompetitorsBid = totalCompetitorsBid;
 	}
 }
 

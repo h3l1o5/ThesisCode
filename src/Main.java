@@ -1,7 +1,6 @@
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import Environment.CombinatorialAuction;
 import Model.Bidder;
@@ -9,21 +8,21 @@ import ProcessMethod.Centralize;
 import ProcessMethod.Game;
 
 public class Main {
-	private static final String OUTPUT_DIR = "C:/Users/Martian/Desktop/results/";
-	private static final int TOTAL_ITERATION = 200;
+	private static final String OUTPUT_DIR = "";
+	private static final int TOTAL_TRIALS = 5000;
 	private static final boolean WITH_SUPERADDITIVE_PROPERTY = true;
 
 	public static void main(String[] args) throws IOException {
 		
-		// standard parameter settings
-		int numberOfBidders = 200;
-		int numberOfGoodTypes = 300;
-		int probability = 5; // percentage
-		int maxAvailableUnitOfEachGoodType = 5;
-		int[] parameters = { numberOfBidders, numberOfGoodTypes, probability, maxAvailableUnitOfEachGoodType };
-
-		// changing every parameter
-		for (int parameter = 3; parameter <= 3; parameter++) {
+		// changing some parameter
+		for (int parameter = 0; parameter <= 3; parameter++) {
+			// standard parameter settings
+			int numberOfBidders = 200;
+			int numberOfGoodTypes = 300;
+			int probability = 5; // percentage
+			int maxAvailableUnitOfEachGoodType = 5;
+			int[] parameters = { numberOfBidders, numberOfGoodTypes, probability, maxAvailableUnitOfEachGoodType };
+			
 			String parameterType = "";
 			int start = 0;
 			int end = 0;
@@ -67,28 +66,29 @@ public class Main {
 				int winner_HABPC = 0;
 				int winner_ABPG = 0;
 				int winner_ABPC = 0;
-				int winner_ABPCG = 0;
+				int winner_AFBPUG = 0;
 				int bid_HABPC = 0;
 				int bid_ABPC = 0;
 				int bid_ABPG = 0;
-				int bid_ABPCG = 0;
+				int bid_AFBPUG = 0;
 				int round_HABPC = 0;
 				int round_ABPG = 0;
 				int round_ABPC = 0;
-				int round_ABPCG = 0;
+				int round_AFBPUG = 0;
 				int centralized_winner_HABPC = 0;
 				int centralized_winner_ABPG = 0;
 				int centralized_winner_ABPC = 0;
-				int centralized_winner_ABPCG = 0;
+				int centralized_winner_AFBPUG = 0;
 				int centralized_bid_HABPC = 0;
 				int centralized_bid_ABPC = 0;
 				int centralized_bid_ABPG = 0;
-				int centralized_bid_ABPCG = 0;
+				int centralized_bid_AFBPUG = 0;
+
 				List<Bidder> bidders;
 
 				System.out.println("value=" + start);
 				// for every settings, run *TOTAL_ITERATION* time trials
-				for (int i = 0; i < TOTAL_ITERATION; i++) {		
+				for (int i = 0; i < TOTAL_TRIALS; i++) {		
 					
 					// create an auction
 					CombinatorialAuction auction = new CombinatorialAuction(parameters[0], parameters[1], parameters[2], parameters[3], WITH_SUPERADDITIVE_PROPERTY);
@@ -99,72 +99,72 @@ public class Main {
 					}
 					
 					// create procedures
-//					Game game = new Game(auction);
+					Game game = new Game(auction);
 					Centralize centralize = new Centralize(auction);
 
-//					round_HABPC += game.start("HABPC");
-//					bidders = auction.getBidders();
-//					for (Bidder bidder : bidders) {
-//						if (bidder.getDecision()) {
-//							winner_HABPC++;
-//							bid_HABPC += bidder.getBid();
-//						}
-//					}
-//					round_ABPG += game.start("ABPG");
-//					bidders = auction.getBidders();
-//					for (Bidder bidder : bidders) {
-//						if (bidder.getDecision()) {
-//							winner_ABPG++;
-//							bid_ABPG += bidder.getBid();
-//						}
-//					}
-//					round_ABPC += game.start("ABPC");
-//					bidders = auction.getBidders();
-//					for (Bidder bidder : bidders) {
-//						if (bidder.getDecision()) {
-//							winner_ABPC++;
-//							bid_ABPC += bidder.getBid();
-//						}
-//					}
-//					round_ABPCG += game.start("ABPCG");
-//					bidders = auction.getBidders();
-//					for (Bidder bidder : bidders) {
-//						if (bidder.getDecision()) {
-//							winner_ABPCG++;
-//							bid_ABPCG += bidder.getBid();
-//						}
-//					}
-
-//					centralize.start("ABPC");
-//					bidders = auction.getBidders();
-//					for (Bidder bidder : bidders) {
-//						if (bidder.getDecision()) {
-//							centralized_winner_ABPC++;
-//							centralized_bid_ABPC += bidder.getBid();
-//						}
-//					}
-//					centralize.start("ABPG");
-//					bidders = auction.getBidders();
-//					for (Bidder bidder : bidders) {
-//						if (bidder.getDecision()) {
-//							centralized_winner_ABPG++;
-//							centralized_bid_ABPG += bidder.getBid();
-//						}
-//					}
-//					centralize.start("HABPC");
-//					bidders = auction.getBidders();
-//					for (Bidder bidder : bidders) {
-//						if (bidder.getDecision()) {
-//							centralized_winner_HABPC++;
-//							centralized_bid_HABPC += bidder.getBid();
-//						}
-//					}
-					centralize.start("ABPCG");
+					round_HABPC += game.start("HABPC");
 					bidders = auction.getBidders();
 					for (Bidder bidder : bidders) {
 						if (bidder.getDecision()) {
-							centralized_winner_ABPCG++;
-							centralized_bid_ABPCG += bidder.getBid();
+							winner_HABPC++;
+							bid_HABPC += bidder.getBid();
+						}
+					}
+					round_ABPG += game.start("ABPG");
+					bidders = auction.getBidders();
+					for (Bidder bidder : bidders) {
+						if (bidder.getDecision()) {
+							winner_ABPG++;
+							bid_ABPG += bidder.getBid();
+						}
+					}
+					round_ABPC += game.start("ABPC");
+					bidders = auction.getBidders();
+					for (Bidder bidder : bidders) {
+						if (bidder.getDecision()) {
+							winner_ABPC++;
+							bid_ABPC += bidder.getBid();
+						}
+					}
+					round_AFBPUG += game.start("AFBPUG");
+					bidders = auction.getBidders();
+					for (Bidder bidder : bidders) {
+						if (bidder.getDecision()) {
+							winner_AFBPUG++;
+							bid_AFBPUG += bidder.getBid();
+						}
+					}
+
+					centralize.start("ABPC");
+					bidders = auction.getBidders();
+					for (Bidder bidder : bidders) {
+						if (bidder.getDecision()) {
+							centralized_winner_ABPC++;
+							centralized_bid_ABPC += bidder.getBid();
+						}
+					}
+					centralize.start("ABPG");
+					bidders = auction.getBidders();
+					for (Bidder bidder : bidders) {
+						if (bidder.getDecision()) {
+							centralized_winner_ABPG++;
+							centralized_bid_ABPG += bidder.getBid();
+						}
+					}
+					centralize.start("HABPC");
+					bidders = auction.getBidders();
+					for (Bidder bidder : bidders) {
+						if (bidder.getDecision()) {
+							centralized_winner_HABPC++;
+							centralized_bid_HABPC += bidder.getBid();
+						}
+					}
+					centralize.start("AFBPUG");
+					bidders = auction.getBidders();
+					for (Bidder bidder : bidders) {
+						if (bidder.getDecision()) {
+							centralized_winner_AFBPUG++;
+							centralized_bid_AFBPUG += bidder.getBid();
 						}
 					}
 				}
@@ -176,48 +176,48 @@ public class Main {
 				fw.write("n: " + parameters[1] + "\r\r\n");
 				fw.write("p: " + parameters[2] + "\r\r\n");
 				fw.write("lambda: " + parameters[3] + "\r\r\n");
-				fw.write("Average competitive intensity: " + competitiveIntensity / TOTAL_ITERATION + "%" + "\r\r\n");
-				fw.write("Average bundle instances amount: " + bundleInstacesAmount / parameters[0] / TOTAL_ITERATION + "\r\r\n");
+				fw.write("Average competitive intensity: " + competitiveIntensity / TOTAL_TRIALS + "%" + "\r\r\n");
+				fw.write("Average bundle instances amount: " + bundleInstacesAmount / parameters[0] / TOTAL_TRIALS + "\r\r\n");
 				fw.write("\r\r\n");
-//				fw.write("////////////////GAME////////////////" + "\r\r\n");
-//				fw.write("-----HABPC-----" + "\r\r\n");
-//				fw.write("Social Welfare: " + (double) bid_HABPC / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("Average bid: " + (double) bid_HABPC / winner_HABPC + "\r\r\n");
-//				fw.write("winner: " + (double) winner_HABPC / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("rounds: " + (double) round_HABPC / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("-----ABPG-----" + "\r\r\n");
-//				fw.write("Social Welfare: " + (double) bid_ABPG / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("Average bid: " + (double) bid_ABPG / winner_ABPG + "\r\r\n");
-//				fw.write("winner: " + (double) winner_ABPG / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("rounds: " + (double) round_ABPG / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("-----ABPC-----" + "\r\r\n");
-//				fw.write("Social Welfare: " + (double) bid_ABPC / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("Average bid: " + (double) bid_ABPC / winner_ABPC + "\r\r\n");
-//				fw.write("winner: " + (double) winner_ABPC / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("rounds: " + (double) round_ABPC / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("-----ABPCG-----" + "\r\r\n");
-//				fw.write("Social Welfare: " + (double) bid_ABPCG / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("Average bid: " + (double) bid_ABPCG / winner_ABPCG + "\r\r\n");
-//				fw.write("winner: " + (double) winner_ABPCG / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("rounds: " + (double) round_ABPCG / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("\r\r\n");
+				fw.write("////////////////GAME////////////////" + "\r\r\n");
+				fw.write("-----HABPC-----" + "\r\r\n");
+				fw.write("Social Welfare: " + (double) bid_HABPC / TOTAL_TRIALS + "\r\r\n");
+				fw.write("Average bid: " + (double) bid_HABPC / winner_HABPC + "\r\r\n");
+				fw.write("winner: " + (double) winner_HABPC / TOTAL_TRIALS + "\r\r\n");
+				fw.write("rounds: " + (double) round_HABPC / TOTAL_TRIALS + "\r\r\n");
+				fw.write("-----ABPG-----" + "\r\r\n");
+				fw.write("Social Welfare: " + (double) bid_ABPG / TOTAL_TRIALS + "\r\r\n");
+				fw.write("Average bid: " + (double) bid_ABPG / winner_ABPG + "\r\r\n");
+				fw.write("winner: " + (double) winner_ABPG / TOTAL_TRIALS + "\r\r\n");
+				fw.write("rounds: " + (double) round_ABPG / TOTAL_TRIALS + "\r\r\n");
+				fw.write("-----ABPC-----" + "\r\r\n");
+				fw.write("Social Welfare: " + (double) bid_ABPC / TOTAL_TRIALS + "\r\r\n");
+				fw.write("Average bid: " + (double) bid_ABPC / winner_ABPC + "\r\r\n");
+				fw.write("winner: " + (double) winner_ABPC / TOTAL_TRIALS + "\r\r\n");
+				fw.write("rounds: " + (double) round_ABPC / TOTAL_TRIALS + "\r\r\n");
+				fw.write("-----AFBPUG-----" + "\r\r\n");
+				fw.write("Social Welfare: " + (double) bid_AFBPUG / TOTAL_TRIALS + "\r\r\n");
+				fw.write("Average bid: " + (double) bid_AFBPUG / winner_AFBPUG + "\r\r\n");
+				fw.write("winner: " + (double) winner_AFBPUG / TOTAL_TRIALS + "\r\r\n");
+				fw.write("rounds: " + (double) round_AFBPUG / TOTAL_TRIALS + "\r\r\n");
+				fw.write("\r\r\n");
 				fw.write("////////////////CENTRALIZE////////////////" + "\r\r\n");
-//				fw.write("-----HABPC-----" + "\r\r\n");
-//				fw.write("Social Welfare: " + (double) centralized_bid_HABPC / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("Average bid: " + (double) centralized_bid_HABPC / centralized_winner_HABPC + "\r\r\n");
-//				fw.write("winner: " + (double) centralized_winner_HABPC / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("-----ABPG-----" + "\r\r\n");
-//				fw.write("Social Welfare: " + (double) centralized_bid_ABPG / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("Average bid: " + (double) centralized_bid_ABPG / centralized_winner_ABPG + "\r\r\n");
-//				fw.write("winner: " + (double) centralized_winner_ABPG / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("-----ABPC-----" + "\r\r\n");
-//				fw.write("Social Welfare: " + (double) centralized_bid_ABPC / TOTAL_ITERATION + "\r\r\n");
-//				fw.write("Average bid: " + (double) centralized_bid_ABPC / centralized_winner_ABPC + "\r\r\n");
-//				fw.write("winner: " + (double) centralized_winner_ABPC / TOTAL_ITERATION + "\r\r\n");
-				fw.write("-----ABPCG-----" + "\r\r\n");
-				fw.write("Social Welfare: " + (double) centralized_bid_ABPCG / TOTAL_ITERATION + "\r\r\n");
-				fw.write("Average bid: " + (double) centralized_bid_ABPCG / centralized_winner_ABPCG + "\r\r\n");
-				fw.write("winner: " + (double) centralized_winner_ABPCG / TOTAL_ITERATION + "\r\r\n");
+				fw.write("-----HABPC-----" + "\r\r\n");
+				fw.write("Social Welfare: " + (double) centralized_bid_HABPC / TOTAL_TRIALS + "\r\r\n");
+				fw.write("Average bid: " + (double) centralized_bid_HABPC / centralized_winner_HABPC + "\r\r\n");
+				fw.write("winner: " + (double) centralized_winner_HABPC / TOTAL_TRIALS + "\r\r\n");
+				fw.write("-----ABPG-----" + "\r\r\n");
+				fw.write("Social Welfare: " + (double) centralized_bid_ABPG / TOTAL_TRIALS + "\r\r\n");
+				fw.write("Average bid: " + (double) centralized_bid_ABPG / centralized_winner_ABPG + "\r\r\n");
+				fw.write("winner: " + (double) centralized_winner_ABPG / TOTAL_TRIALS + "\r\r\n");
+				fw.write("-----ABPC-----" + "\r\r\n");
+				fw.write("Social Welfare: " + (double) centralized_bid_ABPC / TOTAL_TRIALS + "\r\r\n");
+				fw.write("Average bid: " + (double) centralized_bid_ABPC / centralized_winner_ABPC + "\r\r\n");
+				fw.write("winner: " + (double) centralized_winner_ABPC / TOTAL_TRIALS + "\r\r\n");
+				fw.write("-----AFBPUG-----" + "\r\r\n");
+				fw.write("Social Welfare: " + (double) centralized_bid_AFBPUG / TOTAL_TRIALS + "\r\r\n");
+				fw.write("Average bid: " + (double) centralized_bid_AFBPUG / centralized_winner_AFBPUG + "\r\r\n");
+				fw.write("winner: " + (double) centralized_winner_AFBPUG / TOTAL_TRIALS + "\r\r\n");
 				fw.write("////////////////////////////////////////////////////////////\r\r\n");
 				fw.close();
 				
